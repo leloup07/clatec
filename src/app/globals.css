@@ -1,0 +1,42 @@
+:root {
+  --bg: #070b14;
+  --bg-card: #0d1320;
+  --bg-card-hover: #111827;
+  --bg-input: #0f1629;
+  --border: #1a2236;
+  --border-focus: #2d6a7a;
+  --accent: #2d8a9a;
+  --accent-hover: #35a0b2;
+  --accent-muted: #1a5a6a;
+  --text: #dfe1e6;
+  --text-muted: #8892a4;
+  --text-dim: #5a6478;
+  --white: #f0eeea;
+  --danger: #c0392b;
+  --success: #27ae60;
+  --font: 'DM Sans', 'Segoe UI', system-ui, sans-serif;
+  --font-display: 'Sora', 'DM Sans', system-ui, sans-serif;
+}
+
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html { scroll-behavior: smooth; }
+
+body {
+  font-family: var(--font);
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  -webkit-font-smoothing: antialiased;
+}
+
+::selection { background: rgba(45, 138, 154, 0.25); }
+
+a { color: var(--accent); text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+input, textarea, select { font-family: var(--font); }
