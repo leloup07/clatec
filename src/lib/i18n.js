@@ -3,23 +3,21 @@ import { useState, useCallback } from 'react'
 
 const translations = {
   en: {
-    nav: { home: 'Home', expertise: 'Expertise', how: 'How It Works', cases: 'Use Cases', consultation: 'Request Consultation', legal: 'Legal', nda: 'NDA' },
+    nav: { home: 'Home', expertise: 'Expertise', how: 'How It Works', cases: 'Use Cases', consultation: 'Legal Assessment', legal: 'Legal', nda: 'NDA' },
     cta: {
       start: 'Start Analysis',
-      consult: 'Request Consultation',
+      consult: 'Proceed to Legal Assessment',
       learn: 'Learn More',
-      // Conversion-optimized CTAs for different contexts
-      escalate: 'Proceed to Professional Review',
-      escalateSoft: 'Strengthen your position with professional review',
-      chatEnd: 'Continue with a Legal Professional',
+      escalate: 'Proceed to Legal Assessment',
+      escalateSoft: 'Submit for Professional Analysis',
+      chatEnd: 'Proceed to Structured Legal Review',
       intake: 'Begin Structured Analysis',
     },
     home: {
       h1: 'Legal Intelligence for Tokenization & Digital Assets',
       sub: 'CLATEC maps the regulatory landscape of your project before you commit. Structured preliminary guidance across MiCA, CASP, sandbox applications, and cross-border digital asset structuring.',
       tagline: 'Clarity before commitment.',
-      // Value proposition - what makes this NOT a chatbot
-      valueProp: 'CLATEC is not a chatbot. It is a structured legal analysis system that identifies regulatory considerations, flags risk areas, and maps your project against applicable frameworks — before you engage counsel.',
+      valueProp: 'Not a chatbot. Not generic legal information. CLATEC is a rule-based regulatory diagnostic that maps your project against MiCA, CASP, and sandbox frameworks — and tells you exactly where professional review is required.',
       areas_title: 'Regulatory Intelligence Across',
       areas: ['Asset Tokenization', 'MiCA Assessment', 'CASP Authorization', 'Sandbox Applications', 'Cross-Border Structuring', 'Governance & Compliance'],
       process_title: 'A Structured Path to Clarity',
@@ -32,9 +30,9 @@ const translations = {
       // Social proof / differentiation
       diff_title: 'Why CLATEC',
       diffs: [
-        { t: 'Not a chatbot', d: 'Structured analysis with rule-based escalation, regulatory mapping, and classified output — not open-ended conversation.' },
-        { t: 'Jurisdiction-aware', d: 'Built around MiCA, the Spanish Financial Sandbox, FCA DSS, and DLT Pilot Regime. Not generic legal information.' },
-        { t: 'Conversion-ready', d: 'Every analysis identifies whether your matter requires professional legal review — and what that review should cover.' },
+        { t: 'Not a chatbot', d: 'Rule-based escalation. Classified output. Structured methodology. If the system cannot resolve it, it tells you — and tells you why.' },
+        { t: 'Jurisdiction-specific', d: 'Built on MiCA, the Spanish Financial Sandbox, FCA DSS, and the DLT Pilot Regime. Not generic legal information repackaged.' },
+        { t: 'Knows its limits', d: 'CLATEC identifies where preliminary diagnostic ends and professional legal review begins. Every escalation is reasoned, never arbitrary.' },
       ]
     },
     expertise: {
@@ -78,8 +76,8 @@ const translations = {
     },
     consultation: {
       title: 'Professional Legal Review',
-      sub: 'When the analysis indicates that professional review is warranted.',
-      desc: 'CLATEC identifies when your matter requires formal legal advice, deeper regulatory analysis, or human review of documentation. This is a separate professional engagement — not an upsell, but the logical next step when the preliminary analysis reveals complexity that warrants it.',
+      sub: 'When the diagnostic identifies regulatory considerations that require professional analysis.',
+      desc: 'Matters involving token classification uncertainty, CASP authorization, sandbox applications, or multi-jurisdictional structures typically require structured legal review before implementation. This is a separate professional engagement focused on the specific issues identified in your CLATEC diagnostic.',
       features: [
         'Professionals admitted in Spain and England & Wales',
         'Analysis tailored to the specific issues flagged in your preliminary review',
@@ -87,15 +85,13 @@ const translations = {
         'Clear next steps and implementation guidance'
       ],
       form: { name: 'Full name', email: 'Email', company: 'Company (optional)', matter: 'Brief description of your matter', preferred: 'Preferred time slot', submit: 'Submit Request', success: 'Your request has been submitted. We will respond within 24–48 hours.' },
-      // Post-chat conversion
-      postChat: 'Based on the regulatory considerations identified in your analysis, professional review would strengthen your position and clarify your obligations.',
+      postChat: 'The regulatory considerations identified in your analysis typically require professional review before implementation. This is standard practice for matters of this nature.',
     },
-    // Chat-specific conversion copy
     chat: {
       escalation: {
-        soft: 'Based on the elements identified, professional review would strengthen your position on this point.',
-        medium: 'The regulatory considerations here go beyond preliminary guidance. A structured professional review would clarify your obligations and reduce exposure.',
-        strong: 'This matter involves elements — {reasons} — that require professional legal analysis. Proceeding without it introduces material regulatory risk.',
+        soft: 'This type of structure typically requires formal legal review before any implementation step is taken.',
+        medium: 'The regulatory considerations identified — {reasons} — go beyond what preliminary diagnostic can resolve. Structured legal review is the standard next step for matters of this nature.',
+        strong: 'This matter involves {reasons}. These elements require professional legal analysis before you can proceed. The regulatory exposure identified is material and affects your ability to launch, structure, or operate.',
       },
       outputHeaders: {
         summary: 'Matter Summary',
@@ -113,21 +109,21 @@ const translations = {
   },
 
   es: {
-    nav: { home: 'Inicio', expertise: 'Áreas', how: 'Cómo Funciona', cases: 'Casos de Uso', consultation: 'Solicitar Consulta', legal: 'Legal', nda: 'NDA' },
+    nav: { home: 'Inicio', expertise: 'Áreas', how: 'Cómo Funciona', cases: 'Casos de Uso', consultation: 'Evaluación Jurídica', legal: 'Legal', nda: 'NDA' },
     cta: {
       start: 'Iniciar Análisis',
-      consult: 'Solicitar Consulta',
+      consult: 'Proceder a Evaluación Jurídica',
       learn: 'Saber Más',
-      escalate: 'Proceder a Revisión Profesional',
-      escalateSoft: 'Refuerza tu posición con revisión profesional',
-      chatEnd: 'Continuar con un Profesional Jurídico',
+      escalate: 'Proceder a Evaluación Jurídica',
+      escalateSoft: 'Someter a Análisis Profesional',
+      chatEnd: 'Proceder a Revisión Jurídica Estructurada',
       intake: 'Comenzar Análisis Estructurado',
     },
     home: {
       h1: 'Inteligencia Jurídica para Tokenización y Activos Digitales',
       sub: 'CLATEC mapea el paisaje regulatorio de tu proyecto antes de que te comprometas. Orientación preliminar estructurada en MiCA, CASP, sandboxes regulatorios y estructuración transfronteriza de activos digitales.',
       tagline: 'Claridad antes del compromiso.',
-      valueProp: 'CLATEC no es un chatbot. Es un sistema de análisis jurídico estructurado que identifica consideraciones regulatorias, señala áreas de riesgo y mapea tu proyecto contra los marcos aplicables — antes de contratar asesoramiento.',
+      valueProp: 'No es un chatbot. No es información jurídica genérica. CLATEC es un diagnóstico regulatorio basado en reglas que mapea tu proyecto contra los marcos MiCA, CASP y sandbox — y te dice exactamente dónde se requiere revisión profesional.',
       areas_title: 'Inteligencia Regulatoria en',
       areas: ['Tokenización de Activos', 'Evaluación MiCA', 'Autorización CASP', 'Solicitudes de Sandbox', 'Estructuración Transfronteriza', 'Gobernanza y Compliance'],
       process_title: 'Un Camino Estructurado hacia la Claridad',
@@ -139,9 +135,9 @@ const translations = {
       credential: 'Con el apoyo de profesionales jurídicos habilitados en España e Inglaterra y Gales',
       diff_title: 'Por Qué CLATEC',
       diffs: [
-        { t: 'No es un chatbot', d: 'Análisis estructurado con escalación basada en reglas, mapeo regulatorio y output clasificado — no conversación abierta.' },
-        { t: 'Conciencia jurisdiccional', d: 'Construido sobre MiCA, el Sandbox Financiero Español, FCA DSS y el Régimen Piloto DLT. No información jurídica genérica.' },
-        { t: 'Orientado a conversión', d: 'Cada análisis identifica si tu asunto requiere revisión profesional — y qué debe cubrir esa revisión.' },
+        { t: 'No es un chatbot', d: 'Escalación basada en reglas. Output clasificado. Metodología estructurada. Si el sistema no puede resolverlo, te lo dice — y te dice por qué.' },
+        { t: 'Jurisdiccionalmente específico', d: 'Construido sobre MiCA, el Sandbox Financiero Español, FCA DSS y el Régimen Piloto DLT. No información jurídica genérica reempaquetada.' },
+        { t: 'Conoce sus límites', d: 'CLATEC identifica dónde termina el diagnóstico preliminar y dónde comienza la revisión profesional. Cada escalación es razonada, nunca arbitraria.' },
       ]
     },
     expertise: {
@@ -184,8 +180,8 @@ const translations = {
     },
     consultation: {
       title: 'Revisión Jurídica Profesional',
-      sub: 'Cuando el análisis indica que la revisión profesional está justificada.',
-      desc: 'CLATEC identifica cuándo tu asunto requiere asesoramiento jurídico formal, análisis regulatorio profundo o revisión humana de documentación. Se trata de un compromiso profesional separado — no una venta adicional, sino el siguiente paso lógico cuando el análisis preliminar revela complejidad que lo justifica.',
+      sub: 'Cuando el diagnóstico identifica consideraciones regulatorias que requieren análisis profesional.',
+      desc: 'Los asuntos que implican incertidumbre en la clasificación de tokens, autorización CASP, solicitudes de sandbox o estructuras multi-jurisdiccionales habitualmente requieren revisión jurídica estructurada antes de su implementación. Se trata de un compromiso profesional separado enfocado en las cuestiones específicas identificadas en tu diagnóstico CLATEC.',
       features: [
         'Profesionales habilitados en España e Inglaterra y Gales',
         'Análisis adaptado a las cuestiones específicas señaladas en tu revisión preliminar',
@@ -193,13 +189,13 @@ const translations = {
         'Próximos pasos claros y orientación de implementación'
       ],
       form: { name: 'Nombre completo', email: 'Email', company: 'Empresa (opcional)', matter: 'Descripción breve de tu asunto', preferred: 'Franja horaria preferida', submit: 'Enviar Solicitud', success: 'Tu solicitud ha sido enviada. Responderemos en 24–48 horas.' },
-      postChat: 'Según las consideraciones regulatorias identificadas en tu análisis, la revisión profesional reforzaría tu posición y clarificaría tus obligaciones.',
+      postChat: 'Las consideraciones regulatorias identificadas en tu análisis habitualmente requieren revisión profesional antes de su implementación. Es práctica estándar para asuntos de esta naturaleza.',
     },
     chat: {
       escalation: {
-        soft: 'Según los elementos identificados, la revisión profesional reforzaría tu posición en este punto.',
-        medium: 'Las consideraciones regulatorias aquí van más allá de la orientación preliminar. Una revisión profesional estructurada clarificaría tus obligaciones y reduciría la exposición.',
-        strong: 'Este asunto implica elementos — {reasons} — que requieren análisis jurídico profesional. Proceder sin él introduce riesgo regulatorio material.',
+        soft: 'Este tipo de estructura habitualmente requiere revisión jurídica formal antes de cualquier paso de implementación.',
+        medium: 'Las consideraciones regulatorias identificadas — {reasons} — exceden lo que el diagnóstico preliminar puede resolver. La revisión jurídica estructurada es el paso estándar para asuntos de esta naturaleza.',
+        strong: 'Este asunto implica {reasons}. Estos elementos requieren análisis jurídico profesional antes de proceder. La exposición regulatoria identificada es material y afecta tu capacidad de lanzar, estructurar u operar.',
       },
       outputHeaders: {
         summary: 'Resumen del Asunto',
