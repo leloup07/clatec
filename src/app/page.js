@@ -1,5 +1,4 @@
 'use client'
-import { useState } from 'react'
 import Navbar from '@/components/Navbar'
 import Footer from '@/components/Footer'
 import { useLanguage } from '@/lib/i18n'
@@ -9,7 +8,7 @@ export default function Home() {
 
   return (
     <>
-      <Navbar lang={lang} setLang={setLang} />
+      <Navbar lang={lang} setLang={setLang} t={t} />
       <main style={{ maxWidth: 1200, margin: '0 auto', padding: '0 24px' }}>
         {/* Hero */}
         <section style={{ paddingTop: 80, paddingBottom: 60, maxWidth: 800, margin: '0 auto', textAlign: 'center' }}>
@@ -23,17 +22,41 @@ export default function Home() {
             {t.home.sub}
           </p>
           <div style={{ marginTop: 40, display: 'flex', gap: 16, justifyContent: 'center', flexWrap: 'wrap' }}>
-            <a href="/intake" className="btn-primary" style={{ fontSize: 16, padding: '16px 40px', textDecoration: 'none' }}>
-              {t.cta.start}
+            <a href="/intake" style={{ background: 'var(--accent)', color: '#fff', padding: '16px 40px', borderRadius: 6, fontSize: 16, fontWeight: 600, textDecoration: 'none', transition: 'all .2s' }}>
+              {t.cta.intake || t.cta.start}
             </a>
-            <a href="/consultation" className="btn-secondary" style={{ textDecoration: 'none' }}>
+            <a href="/consultation" style={{ background: 'transparent', color: 'var(--accent)', border: '1px solid var(--accent)', padding: '14px 28px', borderRadius: 6, fontSize: 14, fontWeight: 500, textDecoration: 'none' }}>
               {t.cta.consult}
             </a>
           </div>
         </section>
 
+        {/* Value Proposition - NOT A CHATBOT */}
+        <section style={{ maxWidth: 700, margin: '0 auto 64px', textAlign: 'center' }}>
+          <p style={{ fontSize: 15, color: 'var(--text-muted)', lineHeight: 1.8, padding: '24px 32px', background: 'rgba(45,138,154,0.04)', border: '1px solid rgba(45,138,154,0.12)', borderRadius: 8 }}>
+            {t.home.valueProp}
+          </p>
+        </section>
+
         {/* Divider */}
-        <div style={{ width: 60, height: 1, background: 'var(--border)', margin: '64px auto' }} />
+        <div style={{ width: 60, height: 1, background: 'var(--border)', margin: '0 auto 64px' }} />
+
+        {/* Why CLATEC - Differentiation */}
+        {t.home.diffs && (
+          <section style={{ marginBottom: 64 }}>
+            <h2 style={{ fontFamily: 'var(--font-display)', fontSize: 14, fontWeight: 600, color: 'var(--accent)', letterSpacing: 2, textTransform: 'uppercase', textAlign: 'center', marginBottom: 32 }}>
+              {t.home.diff_title}
+            </h2>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: 20 }}>
+              {t.home.diffs.map((d, i) => (
+                <div key={i} className="card" style={{ padding: 28 }}>
+                  <h3 style={{ fontFamily: 'var(--font-display)', fontSize: 16, fontWeight: 600, color: 'var(--white)', marginBottom: 10 }}>{d.t}</h3>
+                  <p style={{ fontSize: 14, color: 'var(--text-muted)', lineHeight: 1.7 }}>{d.d}</p>
+                </div>
+              ))}
+            </div>
+          </section>
+        )}
 
         {/* Areas */}
         <section>
@@ -68,14 +91,14 @@ export default function Home() {
         <section style={{ marginTop: 64, textAlign: 'center' }}>
           <div className="card" style={{ maxWidth: 600, margin: '0 auto', padding: 32 }}>
             <h3 style={{ fontFamily: 'var(--font-display)', fontSize: 18, fontWeight: 600, color: 'var(--white)', marginBottom: 12 }}>
-              {lang === 'en' ? 'Need confidentiality before sharing?' : '¿Necesitas confidencialidad antes de compartir?'}
+              {lang === 'en' ? 'Need confidentiality first?' : '¿Necesitas confidencialidad primero?'}
             </h3>
             <p style={{ fontSize: 14, color: 'var(--text-muted)', marginBottom: 20, lineHeight: 1.6 }}>
               {lang === 'en'
-                ? 'Download our bilateral NDA to protect your project details before engaging with CLATEC.'
-                : 'Descarga nuestro NDA bilateral para proteger los detalles de tu proyecto antes de interactuar con CLATEC.'}
+                ? 'Download our bilateral NDA to protect your project details before sharing.'
+                : 'Descarga nuestro NDA bilateral para proteger los detalles de tu proyecto antes de compartir.'}
             </p>
-            <a href="/nda" className="btn-secondary" style={{ textDecoration: 'none' }}>
+            <a href="/nda" style={{ color: 'var(--accent)', border: '1px solid var(--accent)', padding: '10px 24px', borderRadius: 6, fontSize: 14, fontWeight: 500, textDecoration: 'none', display: 'inline-block' }}>
               {lang === 'en' ? 'Download NDA' : 'Descargar NDA'}
             </a>
           </div>
