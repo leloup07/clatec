@@ -24,7 +24,7 @@ const { useState, useEffect, useRef, useCallback } = React;
 const T = {
   en: {
     nav: { home: "Home", expertise: "Expertise", how: "How It Works", cases: "Use Cases", consultation: "Legal Assessment", legal: "Legal", glossary: "Glossary" },
-    cta: { start: "Start Structured Analysis", consult: "Proceed to Legal Assessment", learn: "Learn More" },
+    cta: { start: "Start Free Analysis", consult: "Proceed to Legal Assessment", learn: "Learn More" },
     home: {
       h1: "Legal Intelligence for Tokenization & Digital Assets",
       h1ext: "Identify regulatory risk before you commit capital, structure, or execute.",
@@ -224,7 +224,7 @@ const T = {
   },
   es: {
     nav: { home: "Inicio", expertise: "Áreas", how: "Cómo Funciona", cases: "Casos de Uso", consultation: "Evaluación Jurídica", legal: "Legal", glossary: "Glosario" },
-    cta: { start: "Iniciar Análisis Estructurado", consult: "Proceder a Evaluación Jurídica", learn: "Saber Más" },
+    cta: { start: "Iniciar Análisis Gratuito", consult: "Proceder a Evaluación Jurídica", learn: "Saber Más" },
     home: {
       h1: "Inteligencia Jurídica para Tokenización y Activos Digitales",
       h1ext: "Identifica el riesgo regulatorio antes de comprometer capital, estructura o ejecución.",
@@ -434,7 +434,7 @@ const fontDisplay = `'Sora', 'DM Sans', system-ui, sans-serif`;
 
 // ─── MAIN APP ────────────────────────────────────────────────────────
 function CLATEC() {
-  const [lang, setLang] = useState("en");
+  const [lang, setLang] = useState("es");
   const [page, setPage] = useState("home");
   const [menuOpen, setMenuOpen] = useState(false);
   const [intakeData, setIntakeData] = useState({});
@@ -502,7 +502,7 @@ function CLATEC() {
       <main style={{ maxWidth:1200, margin:"0 auto", padding:"0 24px" }}>
         {page === "home" && <HomePage t={t} navTo={navTo} lang={lang} />}
         {page === "expertise" && <ExpertisePage t={t} />}
-        {page === "how" && <HowPage t={t} navTo={navTo} />}
+        {page === "how" && <HowPage t={t} navTo={navTo} lang={lang} />}
         {page === "cases" && <CasesPage t={t} navTo={navTo} />}
         {page === "consultation" && <ConsultationPage t={t} lang={lang} sent={consultationSent} setSent={setConsultationSent} />}
         {page === "legal" && <LegalPage t={t} />}
@@ -518,7 +518,7 @@ function CLATEC() {
           <div>
             <div style={{ fontFamily:fontDisplay, fontSize:18, fontWeight:700, letterSpacing:2, color:palette.white, marginBottom:8 }}>CLATEC</div>
             <div style={{ fontSize:12, color:palette.textDim, lineHeight:1.6 }}>
-              {t.footer.operator}<br/>{t.footer.credential}
+              {t.footer.operator}<br/>{t.footer.credential}<br/><a href="mailto:bmm@clatec.consulting" style={{ color:palette.textDim }}>bmm@clatec.consulting</a>
             </div>
           </div>
           <div style={{ display:"flex", flexWrap:"wrap", gap:16, fontSize:12, color:palette.textDim, alignItems:"center" }}>
@@ -558,6 +558,7 @@ function HomePage({ t, navTo, lang }) {
           <button className="btn-primary" onClick={()=>navTo("intake")} style={{ fontSize:16, padding:"16px 40px" }}>{t.cta.start}</button>
           <button className="btn-secondary" onClick={()=>navTo("consultation")}>{t.cta.consult}</button>
         </div>
+        <p style={{ fontSize:12, color:palette.textDim, marginTop:12 }}>{lang === "es" ? "Sin coste. Sin compromiso. Solo diagnóstico preliminar." : "No cost. No commitment. Preliminary diagnostic only."}</p>
       </div>
 
       {/* Divider line */}
@@ -593,10 +594,18 @@ function HomePage({ t, navTo, lang }) {
           {t.home.areas_title}
         </h2>
         <div style={{ display:"grid", gridTemplateColumns:"repeat(auto-fit, minmax(280px, 1fr))", gap:16 }}>
-          {t.home.areas.map((a,i) => (
-            <div key={i} className="card" style={{ padding:20, textAlign:"center" }}>
-              <span style={{ fontSize:15, fontWeight:500, color:palette.white }}>{a}</span>
-            </div>
+          {[
+            { name: t.home.areas[0], url: "/clatec/tokenization-legal-structure/" },
+            { name: t.home.areas[1], url: "/clatec/mica-regulation-explained/" },
+            { name: t.home.areas[2], url: "/clatec/casp-authorization-requirements/" },
+            { name: t.home.areas[3], url: "/clatec/regulatory-sandbox-europe/" },
+            { name: t.home.areas[4], url: "/clatec/token-classification-guide/" },
+            { name: t.home.areas[5], url: "/clatec/governance-compliance/" },
+          ].map((a,i) => (
+            <a key={i} href={a.url} className="card" style={{ padding:20, textAlign:"center", textDecoration:"none", display:"block" }}>
+              <span style={{ fontSize:15, fontWeight:500, color:palette.white }}>{a.name}</span>
+              <span style={{ fontSize:11, color:palette.textDim, display:"block", marginTop:6 }}>{lang === "es" ? "Leer mas" : "Read more"}</span>
+            </a>
           ))}
         </div>
       </div>
@@ -631,6 +640,61 @@ function HomePage({ t, navTo, lang }) {
         </div>
       )}
 
+      {/* Experience */}
+      <div style={{ marginTop:64, maxWidth:700, margin:"64px auto 0" }}>
+        <div style={{ fontSize:12, fontWeight:600, color:palette.accent, letterSpacing:1.5, textTransform:"uppercase", textAlign:"center", marginBottom:20 }}>
+          {lang === "es" ? "Experiencia" : "Track Record"}
+        </div>
+        <div className="card" style={{ padding:24, textAlign:"center" }}>
+          <p style={{ fontSize:15, color:palette.textMuted, lineHeight:1.8 }}>
+            {lang === "es"
+              ? "Proyectos admitidos y validados en el Sandbox Financiero Espanol. Estructuracion regulatoria transfronteriza en mas de 15 jurisdicciones. Interlocucion directa con CNMV, Banco de Espana y FCA. Evaluador certificado BMM por la Government Blockchain Association."
+              : "Projects admitted and validated in the Spanish Financial Sandbox. Cross-border regulatory structuring across 15+ jurisdictions. Direct regulatory engagement with CNMV, Banco de Espana, and FCA. Certified BMM assessor by the Government Blockchain Association."}
+          </p>
+        </div>
+      </div>
+
+      {/* Founder */}
+      <div style={{ marginTop:32, maxWidth:700, margin:"32px auto 0", textAlign:"center" }}>
+        <p style={{ fontSize:14, color:palette.textDim, lineHeight:1.7 }}>
+          {lang === "es"
+            ? "Fundado por un abogado habilitado en Espana e Inglaterra y Gales, profesor en IE Business School, Director Regional para Europa de la Government Blockchain Association, con experiencia directa en sandboxes regulatorios y estructuras de tokenizacion en multiples jurisdicciones."
+            : "Founded by a lawyer admitted in Spain and England and Wales, professor at IE Business School, GBA Europe Regional Director, with direct experience in regulatory sandboxes and tokenization structures across multiple jurisdictions."}
+        </p>
+      </div>
+
+      {/* FAQ */}
+      <div style={{ marginTop:64, maxWidth:700, margin:"64px auto 0" }}>
+        <div style={{ fontSize:12, fontWeight:600, color:palette.accent, letterSpacing:1.5, textTransform:"uppercase", textAlign:"center", marginBottom:20 }}>
+          {lang === "es" ? "Preguntas Frecuentes" : "Common Questions"}
+        </div>
+        {(lang === "es"
+          ? [
+              { q: "Es esto asesoramiento juridico?", a: "No. CLATEC proporciona un diagnostico regulatorio preliminar y estructurado. El asesoramiento juridico formal requiere un compromiso profesional separado." },
+              { q: "Que pasa con mis datos?", a: "Los datos se utilizan exclusivamente para generar tu diagnostico. Consulta nuestra Politica de Privacidad para mas detalle." },
+              { q: "Que pasa despues del analisis?", a: "Recibes un output estructurado con resumen, consideraciones regulatorias, lagunas de informacion y siguiente paso recomendado. Si se justifica revision profesional, puedes proceder a una consulta estructurada de pago." }
+            ]
+          : [
+              { q: "Is this legal advice?", a: "No. CLATEC provides structured preliminary regulatory diagnostic. Formal legal advice requires a separate professional engagement." },
+              { q: "What happens with my data?", a: "Data is used exclusively to generate your diagnostic. See our Privacy Policy for details." },
+              { q: "What happens after the analysis?", a: "You receive a structured output with matter summary, regulatory considerations, information gaps, and recommended next step. If professional review is warranted, you can proceed to a paid structured consultation." }
+            ]
+        ).map((faq, i) => (
+          <div key={i} className="card" style={{ padding:20, marginBottom:12 }}>
+            <p style={{ fontSize:15, fontWeight:600, color:palette.white, marginBottom:6 }}>{faq.q}</p>
+            <p style={{ fontSize:14, color:palette.textMuted, lineHeight:1.6 }}>{faq.a}</p>
+          </div>
+        ))}
+      </div>
+
+      {/* Contact */}
+      <div style={{ marginTop:32, textAlign:"center" }}>
+        <p style={{ fontSize:13, color:palette.textDim }}>
+          {lang === "es" ? "Contacto: " : "Contact: "}
+          <a href="mailto:bmm@clatec.consulting" style={{ color:palette.accent }}>bmm@clatec.consulting</a>
+        </p>
+      </div>
+
       {/* Credential */}
       <div className="fade-up-d3" style={{ marginTop:64, textAlign:"center" }}>
         {t.home.notFor && <p style={{ fontSize:12, color:palette.textDim, marginBottom:12, letterSpacing:.5 }}>{t.home.notFor}</p>}
@@ -661,31 +725,105 @@ function ExpertisePage({ t }) {
 }
 
 // ─── HOW IT WORKS PAGE ───────────────────────────────────────────────
-function HowPage({ t, navTo }) {
+function HowPage({ t, navTo, lang }) {
   return (
     <div style={{ paddingTop:60, paddingBottom:60 }}>
       <div className="fade-up">
         <h1 className="section-title">{t.how.title}</h1>
         <p className="section-sub">{t.how.sub}</p>
       </div>
-      <div style={{ marginTop:40, display:"grid", gap:24 }}>
-        {t.how.steps.map((s,i) => (
-          <div key={i} className="card fade-up" style={{ animationDelay:`${i*.1}s`, display:"flex", gap:20, alignItems:"flex-start" }}>
-            <div style={{ width:48, height:48, borderRadius:10, background:`${palette.accent}15`, border:`1px solid ${palette.accent}30`, display:"flex", alignItems:"center", justifyContent:"center", flexShrink:0 }}>
-              <span style={{ fontFamily:fontDisplay, fontWeight:700, color:palette.accent, fontSize:20 }}>{i+1}</span>
-            </div>
-            <div>
-              <h3 style={{ fontFamily:fontDisplay, fontSize:18, fontWeight:600, color:palette.white, marginBottom:8 }}>{s.t}</h3>
-              <p style={{ fontSize:14, color:palette.textMuted, lineHeight:1.7 }}>{s.d}</p>
+      <div style={{ marginTop:40 }}>
+        <div style={{ display:"flex", alignItems:"center", gap:12, marginBottom:24 }}>
+          <span style={{ background:palette.accent, color:"#fff", padding:"4px 14px", borderRadius:20, fontSize:12, fontWeight:700, letterSpacing:1 }}>
+            {lang === "es" ? "GRATUITO" : "FREE"}
+          </span>
+          <span style={{ fontSize:14, color:palette.textMuted }}>
+            {lang === "es" ? "Sin coste, sin compromiso, sin registro de pago" : "No cost, no commitment, no payment required"}
+          </span>
+        </div>
+        <div className="card fade-up" style={{ display:"flex", gap:20, alignItems:"flex-start", marginBottom:16 }}>
+          <div style={{ width:48, height:48, borderRadius:10, background:palette.accent+"15", border:"1px solid "+palette.accent+"30", display:"flex", alignItems:"center", justifyContent:"center", flexShrink:0 }}>
+            <span style={{ fontFamily:fontDisplay, fontWeight:700, color:palette.accent, fontSize:20 }}>1</span>
+          </div>
+          <div>
+            <h3 style={{ fontFamily:fontDisplay, fontSize:18, fontWeight:600, color:palette.white, marginBottom:8 }}>
+              {lang === "es" ? "Describe tu proyecto" : "Describe your project"}
+            </h3>
+            <p style={{ fontSize:14, color:palette.textMuted, lineHeight:1.7 }}>
+              {lang === "es"
+                ? "Completa un cuestionario guiado adaptado a tu tipo de asunto. El sistema adapta sus preguntas segun trabajes en tokenizacion, MiCA, CASP, sandbox u otras materias."
+                : "Complete a guided questionnaire tailored to your matter type. The system adapts - tokenization, MiCA, CASP, sandbox, or cross-border - asking only what is relevant."}
+            </p>
+          </div>
+        </div>
+        <div className="card fade-up-d1" style={{ display:"flex", gap:20, alignItems:"flex-start", marginBottom:16 }}>
+          <div style={{ width:48, height:48, borderRadius:10, background:palette.accent+"15", border:"1px solid "+palette.accent+"30", display:"flex", alignItems:"center", justifyContent:"center", flexShrink:0 }}>
+            <span style={{ fontFamily:fontDisplay, fontWeight:700, color:palette.accent, fontSize:20 }}>2</span>
+          </div>
+          <div>
+            <h3 style={{ fontFamily:fontDisplay, fontSize:18, fontWeight:600, color:palette.white, marginBottom:8 }}>
+              {lang === "es" ? "Recibe tu diagnostico regulatorio" : "Receive your regulatory diagnostic"}
+            </h3>
+            <p style={{ fontSize:14, color:palette.textMuted, lineHeight:1.7 }}>
+              {lang === "es"
+                ? "Un sistema de analisis inteligente identifica marcos aplicables, senala activadores regulatorios, nota lagunas de informacion y estructura las dimensiones juridicas de tu proyecto."
+                : "An intelligent analysis system identifies applicable frameworks, flags regulatory triggers, notes information gaps, and structures the legal dimensions of your project."}
+            </p>
+          </div>
+        </div>
+        <div style={{ textAlign:"center", margin:"24px 0" }}>
+          <button className="btn-primary" onClick={()=>navTo("intake")} style={{ fontSize:16, padding:"16px 40px" }}>
+            {lang === "es" ? "Iniciar Analisis Gratuito" : "Start Free Analysis"}
+          </button>
+          <p style={{ fontSize:12, color:palette.textDim, marginTop:10 }}>
+            {lang === "es" ? "Sin coste. Sin compromiso. Solo diagnostico preliminar." : "No cost. No commitment. Preliminary diagnostic only."}
+          </p>
+        </div>
+      </div>
+      <div style={{ display:"flex", alignItems:"center", gap:16, margin:"48px 0" }}>
+        <div style={{ flex:1, height:1, background:palette.border }}></div>
+        <span style={{ fontSize:12, color:palette.textDim, letterSpacing:1 }}>
+          {lang === "es" ? "CUANDO SE NECESITA MAS" : "WHEN MORE IS NEEDED"}
+        </span>
+        <div style={{ flex:1, height:1, background:palette.border }}></div>
+      </div>
+      <div>
+        <div style={{ display:"flex", alignItems:"center", gap:12, marginBottom:24 }}>
+          <span style={{ background:palette.bgCard, color:palette.white, padding:"4px 14px", borderRadius:20, fontSize:12, fontWeight:700, letterSpacing:1, border:"1px solid "+palette.border }}>
+            {lang === "es" ? "CONSULTA PROFESIONAL" : "PROFESSIONAL REVIEW"}
+          </span>
+          <span style={{ fontSize:14, color:palette.textMuted }}>
+            {lang === "es" ? "Precio fijo, alcance definido, prepago" : "Fixed price, defined scope, prepayment"}
+          </span>
+        </div>
+        <div className="card fade-up-d2" style={{ display:"flex", gap:20, alignItems:"flex-start", marginBottom:16 }}>
+          <div style={{ width:48, height:48, borderRadius:10, background:palette.bgInput, border:"1px solid "+palette.border, display:"flex", alignItems:"center", justifyContent:"center", flexShrink:0 }}>
+            <span style={{ fontFamily:fontDisplay, fontWeight:700, color:palette.white, fontSize:20 }}>3</span>
+          </div>
+          <div>
+            <h3 style={{ fontFamily:fontDisplay, fontSize:18, fontWeight:600, color:palette.white, marginBottom:8 }}>
+              {lang === "es" ? "Revision profesional estructurada" : "Structured professional review"}
+            </h3>
+            <p style={{ fontSize:14, color:palette.textMuted, lineHeight:1.7 }}>
+              {lang === "es"
+                ? "Cuando el diagnostico identifica riesgos regulatorios que requieren analisis profesional, puedes proceder a una revision estructurada con profesionales juridicos habilitados. Confirmacion de supuestos, analisis de riesgos criticos, escenarios y recomendacion clara."
+                : "When the diagnostic identifies regulatory risks that require professional analysis, you can proceed to a structured review with qualified legal professionals. Assumption confirmation, critical risk analysis, scenario mapping, and clear recommendation."}
+            </p>
+            <div style={{ display:"flex", gap:16, marginTop:12 }}>
+              <div style={{ background:palette.bgInput, border:"1px solid "+palette.border, borderRadius:6, padding:"10px 16px" }}>
+                <span style={{ fontSize:12, color:palette.textDim }}>Structured Review</span>
+                <div style={{ fontSize:18, fontWeight:700, color:palette.accent, fontFamily:fontDisplay }}>\u20AC450</div>
+              </div>
+              <div style={{ background:palette.bgInput, border:"1px solid "+palette.border, borderRadius:6, padding:"10px 16px" }}>
+                <span style={{ fontSize:12, color:palette.textDim }}>Complex Matter</span>
+                <div style={{ fontSize:18, fontWeight:700, color:palette.accent, fontFamily:fontDisplay }}>\u20AC750</div>
+              </div>
             </div>
           </div>
-        ))}
+        </div>
       </div>
-      <div style={{ marginTop:32, padding:24, background:`${palette.accent}08`, border:`1px solid ${palette.accent}20`, borderRadius:8 }}>
+      <div style={{ marginTop:32, padding:24, background:palette.accent+"08", border:"1px solid "+palette.accent+"20", borderRadius:8 }}>
         <p style={{ fontSize:13, color:palette.textDim, lineHeight:1.7, fontStyle:"italic" }}>{t.how.disclaimer}</p>
-      </div>
-      <div style={{ marginTop:32, textAlign:"center" }}>
-        <button className="btn-primary" onClick={()=>navTo("intake")}>{t.cta.start}</button>
       </div>
     </div>
   );
@@ -1207,6 +1345,10 @@ function ChatPage({ t, lang, intake, messages, setMessages, navTo }) {
   }, [messages, loading]);
 
   const sendMessage = () => {
+    if (messages.length >= 10) {
+      setChatMessages(prev => [...prev, { role: "assistant", content: lang === "en" ? "This analysis session has reached its limit. For further analysis, please proceed to professional review." : "Esta sesion de analisis ha alcanzado su limite. Para analisis adicional, proceda a revision profesional." }]);
+      return;
+    }
     if (!input.trim() || loading) return;
     const userMsg = { role: "user", content: input.trim() };
     setMessages(prev => [...prev, userMsg]);
