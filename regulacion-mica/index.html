@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Regulación MiCA Explicada — Mercados de Criptoactivos | CLATEC</title>
+  <meta name="description" content="Guía completa del Reglamento europeo de Mercados de Criptoactivos (MiCA). Alcance, clasificaciones de tokens, requisitos del libro blanco, autorización CASP, exenciones y disposiciones transitorias.">
+  <meta property="og:title" content="Regulación MiCA Explicada — Mercados de Criptoactivos | CLATEC">
+  <meta property="og:description" content="Guía completa del Reglamento europeo de Mercados de Criptoactivos (MiCA). Alcance, clasificaciones de tokens, requisitos del libro blanco, autorización CASP, exenciones y disposiciones transitorias.">
+  <meta property="og:type" content="article">
+  <meta property="og:url" content="https://clatec.consulting/regulacion-mica/">
+  <link rel="canonical" href="https://clatec.consulting/regulacion-mica/">
+  <link rel="alternate" hreflang="en" href="https://clatec.consulting/mica-regulation-explained/">
+  <link rel="alternate" hreflang="es" href="https://clatec.consulting/regulacion-mica/">
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E⚖%3C/text%3E%3C/svg%3E">
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Sora:wght@400;600;700&display=swap" rel="stylesheet">
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'DM Sans', system-ui, sans-serif; background: #070b14; color: #dfe1e6; line-height: 1.8; }
+    .container { max-width: 780px; margin: 0 auto; padding: 0 24px; }
+    nav { position: sticky; top: 0; z-index: 100; background: rgba(7,11,20,.93); backdrop-filter: blur(16px); border-bottom: 1px solid #1a2236; padding: 16px 24px; display: flex; justify-content: space-between; align-items: center; }
+    nav a { color: #8892a4; text-decoration: none; font-size: 13px; }
+    .logo { font-family: 'Sora', system-ui; font-size: 22px; font-weight: 700; letter-spacing: 2px; color: #f0eeea; text-decoration: none; }
+    h1 { font-family: 'Sora', system-ui; font-size: 38px; font-weight: 700; color: #f0eeea; line-height: 1.2; margin: 60px 0 16px; letter-spacing: -.5px; }
+    h2 { font-family: 'Sora', system-ui; font-size: 22px; font-weight: 600; color: #f0eeea; margin: 40px 0 12px; }
+    p { margin-bottom: 16px; color: #8892a4; font-size: 16px; }
+    .meta-desc { font-size: 18px; color: #8892a4; margin-bottom: 40px; border-left: 3px solid #35a8b8; padding-left: 16px; }
+    .cta-box { background: #0d1320; border: 1px solid #1a2236; border-radius: 10px; padding: 32px; text-align: center; margin: 48px 0; }
+    .cta-box h3 { font-family: 'Sora', system-ui; font-size: 18px; color: #f0eeea; margin-bottom: 12px; }
+    .cta-box p { font-size: 14px; color: #5a6478; }
+    .cta-btn { display: inline-block; background: #35a8b8; color: #fff; padding: 14px 32px; border-radius: 6px; text-decoration: none; font-weight: 600; font-size: 15px; margin-top: 16px; }
+    .cta-btn:hover { background: #40bfcf; }
+    .boundary { font-size: 12px; color: #5a6478; text-align: center; font-style: italic; margin: 32px 0; }
+    .lang-switch { background: #0d1320; color: #8892a4; border: 1px solid #1a2236; padding: 4px 10px; border-radius: 4px; font-size: 11px; font-weight: 600; text-decoration: none; }
+    footer { border-top: 1px solid #1a2236; margin-top: 60px; padding: 32px 24px; text-align: center; }
+    footer p { font-size: 12px; color: #5a6478; }
+    footer a { color: #35a8b8; text-decoration: none; }
+    @media (max-width: 600px) { h1 { font-size: 28px; } h2 { font-size: 18px; } .container { padding: 0 16px; } }
+  </style>
+</head>
+<body>
+  <nav>
+    <a href="/" class="logo">CLATEC</a>
+    <div style="display:flex;gap:16px;align-items:center;">
+      <a href="/">Inicio</a>
+      <a href="/mica-regulation-explained/" class="lang-switch">EN</a>
+    </div>
+  </nav>
+  <main class="container">
+    <h1>Regulación MiCA: Qué Cubre, A Quién Afecta y Cómo Cumplir</h1>
+    <p class="meta-desc">Guía completa del Reglamento europeo de Mercados de Criptoactivos (MiCA). Alcance, clasificaciones de tokens, requisitos del libro blanco, autorización CASP, exenciones y disposiciones transitorias.</p>
+    <h2>¿Qué es MiCA?</h2>
+    <p>El Reglamento de Mercados de Criptoactivos (Reglamento (UE) 2023/1114) es el marco normativo integral de la Unión Europea para criptoactivos que no están ya regulados como instrumentos financieros bajo MiFID II. Entró en vigor en junio de 2023, con aplicación completa desde diciembre de 2024.</p>
+    <p>MiCA crea un marco regulatorio unificado en todos los Estados miembros de la UE, reemplazando el mosaico de enfoques nacionales que anteriormente gobernaban los criptoactivos. Cubre tres áreas principales: normas para la emisión de tokens (incluyendo libros blancos), regímenes específicos para tokens referenciados a activos (ART) y tokens de dinero electrónico (EMT), y requisitos de autorización para proveedores de servicios de criptoactivos (CASP).</p>
+
+    <h2>Alcance: ¿qué cae bajo MiCA?</h2>
+    <p>MiCA se aplica a criptoactivos que no están ya clasificados como instrumentos financieros, depósitos, depósitos estructurados o posiciones de titulización. La exclusión clave es el Artículo 2(4): los tokens que califican como valores negociables bajo MiFID II quedan completamente fuera de MiCA y se rigen por la regulación de valores existente.</p>
+    <p>Otras exclusiones incluyen: monedas digitales de bancos centrales, criptoactivos emitidos por bancos centrales actuando como autoridad monetaria, depósitos y ciertos productos de seguros. Los NFTs generalmente están excluidos salvo que sean fungibles en la práctica o exhiban características de instrumentos financieros — una zona gris que requiere análisis caso por caso.</p>
+
+    <h2>Categorías de tokens bajo MiCA</h2>
+    <p>Tokens Referenciados a Activos (Título III, Artículos 16-47): tokens que mantienen valor estable referenciando múltiples activos, divisas o materias primas. Los emisores deben estar autorizados, mantener reservas y ofrecer derechos de reembolso. Los ART "significativos" enfrentan requisitos reforzados.</p>
+    <p>Tokens de Dinero Electrónico (Título IV, Artículos 48-58): tokens que referencian una sola moneda oficial. Deben ser emitidos por entidades de crédito o de dinero electrónico autorizadas. El reembolso a valor nominal debe estar disponible en cualquier momento.</p>
+    <p>Otros criptoactivos (Título II, Artículos 4-15): todos los criptoactivos que no son ART, EMT ni instrumentos financieros. Sujetos a requisitos del libro blanco incluyendo especificaciones de contenido, notificación a autoridades competentes y normas sobre comunicaciones comerciales.</p>
+
+    <h2>Autorización CASP</h2>
+    <p>El Título V (Artículos 59-83) requiere autorización para las entidades que prestan servicios de criptoactivos dentro de la UE. Se definen diez categorías de servicios: custodia y administración, operación de plataforma de negociación, servicios de intercambio, ejecución de órdenes, colocación, recepción y transmisión de órdenes, asesoramiento, gestión de carteras y servicios de transferencia.</p>
+    <p>La autorización la concede la autoridad competente del Estado miembro de origen y permite el pasaporte en toda la UE. Se aplican requisitos organizativos, prudenciales y de conducta. Las disposiciones transitorias permitieron a los proveedores existentes continuar operando temporalmente, pero ahora se requieren nuevas autorizaciones.</p>
+
+    <h2>Exenciones y disposiciones transitorias</h2>
+    <p>El Artículo 143 proporcionó mecanismos transitorios para los CASPs que ya operaban antes de la fecha de aplicación de MiCA. La duración varió según la implementación de cada Estado miembro.</p>
+    <p>Las ofertas a pequeña escala pueden beneficiarse de requisitos simplificados. Las transacciones intragrupo y los tokens distribuidos gratuitamente tienen condiciones de exención específicas. Cada exención tiene condiciones precisas que deben verificarse contra los hechos específicos.</p>
+
+    <h2>¿Se aplica MiCA a tu proyecto?</h2>
+    <p>La respuesta depende de: qué representa tu token, cómo mantiene su valor (si lo hace), si prestas servicios de criptoactivos, dónde están ubicados tus usuarios y si alguna exclusión aplica a tu estructura específica.</p>
+    <p>CLATEC mapea tu modelo de token y actividades de servicio contra el alcance, clasificaciones y exenciones de MiCA — identificando dónde surgen obligaciones antes de que presentes o comercialices.</p>
+
+    <div class="cta-box">
+      <h3>Mapea tu proyecto contra este marco</h3>
+      <p>CLATEC proporciona diagnostico regulatorio estructurado — no asesoramiento juridico. Identifica marcos aplicables, riesgos de clasificacion y que debe cubrir la revision profesional.</p>
+      <a href="/" class="cta-btn">Iniciar Analisis Gratuito</a>
+    </div>
+
+    <p class="boundary">Este contenido es solo informativo. No constituye asesoramiento juridico. Los marcos regulatorios evolucionan; verifique siempre la aplicabilidad actual con profesionales cualificados.</p>
+  </main>
+  <footer>
+    <p>CLATEC — Operado por Aznar Legal & Compliance SLP</p>
+    <p style="margin-top:8px;">
+      <a href="/tokenizacion-estructura-legal/">Tokenizacion</a> &middot;
+      <a href="/regulacion-mica/">MiCA</a> &middot;
+      <a href="/requisitos-autorizacion-casp/">CASP</a> &middot;
+      <a href="/clasificacion-tokens/">Clasificacion</a> &middot;
+      <a href="/sandbox-regulatorio-europa/">Sandboxes</a> &middot;
+      <a href="/gobernanza-compliance/">Gobernanza</a> &middot;
+      <a href="/gobernanza-ia/">IA</a>
+    </p>
+  </footer>
+</body>
+</html>

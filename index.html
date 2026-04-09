@@ -595,12 +595,12 @@ function HomePage({ t, navTo, lang }) {
         </h2>
         <div style={{ display:"grid", gridTemplateColumns:"repeat(auto-fit, minmax(280px, 1fr))", gap:16 }}>
           {[
-            { name: t.home.areas[0], url: "/tokenization-legal-structure/" },
-            { name: t.home.areas[1], url: "/mica-regulation-explained/" },
-            { name: t.home.areas[2], url: "/casp-authorization-requirements/" },
-            { name: t.home.areas[3], url: "/regulatory-sandbox-europe/" },
-            { name: t.home.areas[4], url: "/token-classification-guide/" },
-            { name: t.home.areas[5], url: "/governance-compliance/" },
+            { name: t.home.areas[0], url: lang==="es"?"/tokenizacion-estructura-legal/":"/tokenization-legal-structure/" },
+            { name: t.home.areas[1], url: lang==="es"?"/regulacion-mica/":"/mica-regulation-explained/" },
+            { name: t.home.areas[2], url: lang==="es"?"/requisitos-autorizacion-casp/":"/casp-authorization-requirements/" },
+            { name: t.home.areas[3], url: lang==="es"?"/sandbox-regulatorio-europa/":"/regulatory-sandbox-europe/" },
+            { name: t.home.areas[4], url: lang==="es"?"/clasificacion-tokens/":"/token-classification-guide/" },
+            { name: t.home.areas[5], url: lang==="es"?"/gobernanza-compliance/":"/governance-compliance/" },
           ].map((a,i) => (
             <a key={i} href={a.url} className="card" style={{ padding:20, textAlign:"center", textDecoration:"none", display:"block" }}>
               <span style={{ fontSize:15, fontWeight:500, color:palette.white }}>{a.name}</span>
