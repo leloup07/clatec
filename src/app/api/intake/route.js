@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server'
 import { createServerClient } from '@/lib/supabase'
+import { notifyNewLead } from '@/lib/email'
 import { computeEscalationFlags, computeCompoundTriggers, computeComplexityScore, getEscalationLevel } from '@/lib/system-prompt'
 
 const MATTER_TYPE_MAP = {
@@ -23,9 +24,43 @@ const STAGE_MAP = {
 
 const URGENCY_MAP = { 'Low': 'low', 'Baja': 'low', 'Medium': 'medium', 'Media': 'medium', 'High': 'high', 'Alta': 'high' }
 
+const INTAKE_FIELDS = [
+  'firstName', 'lastName', 'email', 'company', 'role', 'country', 'mainJurisdiction', 'otherJurisdictions',
+  'matterType', 'projectStage', 'objective', 'description', 'urgency',
+  'assetType', 'economicReturn', 'investorsExpected', 'investorType', 'issuanceSize', 'entityExists', 'docsExist',
+  'tokenType', 'refersToAssets', 'stableValue', 'cryptoServices', 'targetJurisdictions', 'publicMarketing',
+  'serviceType', 'custodyInvolved', 'exchangeInvolved', 'advisoryInvolved', 'clientType', 'incorporation',
+  'innovationElement', 'regulatoryBarrier', 'mvpExists', 'intendedMarket', 'supervisoryAngle', 'targetSandbox',
+]
+const LONG_FIELDS = ['description', 'innovationElement', 'regulatoryBarrier', 'supervisoryAngle']
+const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+
+// Keep only known fields, as trimmed strings with a length cap
+function sanitize(raw) {
+  const out = {}
+  for (const k of INTAKE_FIELDS) {
+    if (typeof raw[k] === 'string' && raw[k].trim()) {
+      out[k] = raw[k].trim().slice(0, LONG_FIELDS.includes(k) ? 5000 : 300)
+    }
+  }
+  out.language = raw.language === 'es' ? 'es' : 'en'
+  return out
+}
+
 export async function POST(request) {
   try {
-    const body = await request.json()
+    const raw = await request.json()
+    const body = sanitize(raw || {})
+
+    if (!body.firstName || !body.email || !EMAIL_RE.test(body.email) || !body.matterType || !body.description) {
+      return NextResponse.json({ error: 'Missing required fields' }, { status: 400 })
+    }
+    if (!(raw.consent1 && raw.consent2 && raw.consent3)) {
+      return NextResponse.json({ error: 'Consents required' }, { status: 400 })
+    }
+    // Honeypot: real users never fill this hidden field
+    if (raw.website) return NextResponse.json({ error: 'Rejected' }, { status: 400 })
+
     const supabase = createServerClient()
 
     // Compute escalation: flags → compounds → score → level
@@ -54,7 +89,8 @@ export async function POST(request) {
         complexity_score: complexityScore,
         escalation_flag: escalationLevel !== 'none',
         consultation_intent: escalationLevel === 'strong' ? 9 : escalationLevel === 'medium' ? 6 : escalationLevel === 'soft' ? 3 : 1,
-        language: body.language || 'en',
+        language: body.language,
+        intake_raw: body,
       })
       .select()
       .single()
@@ -98,9 +134,13 @@ export async function POST(request) {
     }
 
     // Log consents
-    for (const consent of ['privacy_policy', 'terms_of_use', 'preliminary_guidance_disclaimer']) {
-      await supabase.from('consent_log').insert({ lead_id: lead.id, consent_type: consent, version: '1.2', accepted: true })
-    }
+    const userAgent = request.headers.get('user-agent')?.slice(0, 300) || null
+    const ip = request.headers.get('x-forwarded-for')?.split(',')[0]?.trim() || null
+    await supabase.from('consent_log').insert(
+      ['privacy_policy', 'terms_of_use', 'preliminary_guidance_disclaimer'].map(consent => ({
+        lead_id: lead.id, consent_type: consent, version: '1.2', accepted: true, ip_address: ip, user_agent: userAgent,
+      }))
+    )
 
     // Create conversation with compound trigger metadata
     await supabase.from('conversations').insert({
@@ -123,6 +163,8 @@ export async function POST(request) {
         escalation_level: escalationLevel,
       },
     })
+
+    await notifyNewLead(lead, escalationLevel)
 
     return NextResponse.json({
       success: true,

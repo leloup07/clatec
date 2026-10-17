@@ -84,7 +84,10 @@ CREATE TABLE leads (
   follow_up_date  DATE,
 
   -- Language
-  language        TEXT DEFAULT 'en' CHECK (language IN ('en', 'es'))
+  language        TEXT DEFAULT 'en' CHECK (language IN ('en', 'es')),
+
+  -- Full intake as submitted (sanitized server-side); used to build the chat context
+  intake_raw      JSONB
 );
 
 CREATE INDEX idx_leads_status ON leads(status);
@@ -176,6 +179,7 @@ CREATE TABLE conversations (
   auto_summary    TEXT,           -- AI-generated summary, editable by admin
   escalation_recommended BOOLEAN DEFAULT false,
   escalation_reasons     TEXT[],  -- array of reasons
+  evasion_count          INTEGER DEFAULT 0,  -- guard: regulatory-evasion attempts (2 = blocked)
 
   UNIQUE(lead_id)
 );
@@ -202,7 +206,7 @@ CREATE INDEX idx_messages_conversation ON messages(conversation_id, created_at);
 
 CREATE TABLE consultation_requests (
   id              UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-  lead_id         UUID NOT NULL REFERENCES leads(id) ON DELETE CASCADE,
+  lead_id         UUID REFERENCES leads(id) ON DELETE SET NULL,  -- optional: requests can come without an intake
   created_at      TIMESTAMPTZ NOT NULL DEFAULT now(),
   updated_at      TIMESTAMPTZ NOT NULL DEFAULT now(),
 
@@ -224,6 +228,11 @@ CREATE TABLE consultation_requests (
   payment_currency    TEXT DEFAULT 'EUR',
   stripe_payment_id   TEXT,
   payment_status      TEXT CHECK (payment_status IN ('pending', 'paid', 'refunded', 'failed')),
+  tier                TEXT CHECK (tier IN ('standard', 'complex')),
+
+  -- KYC (post-payment client identification — sensitive, server access only)
+  kyc_data            JSONB,
+  kyc_completed_at    TIMESTAMPTZ,
 
   -- Admin
   internal_notes  TEXT,
@@ -232,6 +241,7 @@ CREATE TABLE consultation_requests (
 
 CREATE INDEX idx_consultations_status ON consultation_requests(status);
 CREATE INDEX idx_consultations_lead ON consultation_requests(lead_id);
+CREATE UNIQUE INDEX idx_consultations_stripe ON consultation_requests(stripe_payment_id) WHERE stripe_payment_id IS NOT NULL;
 
 -- ─── CONSENT LOG ─────────────────────────────────────────────────────
 
@@ -355,37 +365,31 @@ CREATE TRIGGER knowledge_base_updated_at BEFORE UPDATE ON knowledge_base
   FOR EACH ROW EXECUTE FUNCTION update_updated_at();
 
 -- ─── ROW LEVEL SECURITY (Supabase) ──────────────────────────────────
+-- The browser never talks to Supabase: every read/write goes through the
+-- Next.js API routes with the service role key (which bypasses RLS).
+-- RLS is therefore enabled on EVERY table with NO policies, so the public
+-- anon key and authenticated users can read or write nothing.
 
 ALTER TABLE leads ENABLE ROW LEVEL SECURITY;
+ALTER TABLE intake_tokenization ENABLE ROW LEVEL SECURITY;
+ALTER TABLE intake_mica ENABLE ROW LEVEL SECURITY;
+ALTER TABLE intake_casp ENABLE ROW LEVEL SECURITY;
+ALTER TABLE intake_sandbox ENABLE ROW LEVEL SECURITY;
 ALTER TABLE conversations ENABLE ROW LEVEL SECURITY;
 ALTER TABLE messages ENABLE ROW LEVEL SECURITY;
 ALTER TABLE consultation_requests ENABLE ROW LEVEL SECURITY;
 ALTER TABLE consent_log ENABLE ROW LEVEL SECURITY;
 ALTER TABLE audit_log ENABLE ROW LEVEL SECURITY;
+ALTER TABLE email_log ENABLE ROW LEVEL SECURITY;
 ALTER TABLE admin_users ENABLE ROW LEVEL SECURITY;
-
--- Admin-only access policies (adjust for your auth setup)
-CREATE POLICY admin_leads ON leads FOR ALL
-  USING (auth.jwt() ->> 'role' = 'admin');
-
-CREATE POLICY admin_conversations ON conversations FOR ALL
-  USING (auth.jwt() ->> 'role' = 'admin');
-
-CREATE POLICY admin_messages ON messages FOR ALL
-  USING (auth.jwt() ->> 'role' = 'admin');
-
--- Public insert for lead creation (intake form)
-CREATE POLICY public_insert_leads ON leads FOR INSERT
-  WITH CHECK (true);
-
-CREATE POLICY public_insert_consent ON consent_log FOR INSERT
-  WITH CHECK (true);
+ALTER TABLE analytics_events ENABLE ROW LEVEL SECURITY;
+ALTER TABLE knowledge_base ENABLE ROW LEVEL SECURITY;
 
 -- ═══════════════════════════════════════════════════════════════════
 -- VIEWS (Admin Dashboard)
 -- ═══════════════════════════════════════════════════════════════════
 
-CREATE VIEW v_lead_overview AS
+CREATE VIEW v_lead_overview WITH (security_invoker = true) AS
 SELECT
   l.id,
   l.created_at,
@@ -408,7 +412,7 @@ LEFT JOIN conversations c ON c.lead_id = l.id
 LEFT JOIN consultation_requests cr ON cr.lead_id = l.id
 ORDER BY l.created_at DESC;
 
-CREATE VIEW v_dashboard_metrics AS
+CREATE VIEW v_dashboard_metrics WITH (security_invoker = true) AS
 SELECT
   COUNT(*) AS total_leads,
   COUNT(*) FILTER (WHERE status = 'consultation_requested') AS total_consultations_requested,
@@ -426,3 +430,7 @@ SELECT
   COUNT(*) FILTER (WHERE urgency = 'medium') AS urgency_medium,
   COUNT(*) FILTER (WHERE urgency = 'low') AS urgency_low
 FROM leads;
+
+-- Views run with the caller's permissions (security_invoker) and are not
+-- exposed to the public API roles at all.
+REVOKE ALL ON v_lead_overview, v_dashboard_metrics FROM anon, authenticated;

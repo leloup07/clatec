@@ -47,15 +47,19 @@ clatec/
 │   │   ├── legal/page.js              # Notice, Privacy, Terms, Disclaimer
 │   │   ├── nda/page.js                # NDA download + pre-signed request
 │   │   ├── admin/page.js              # Lead dashboard + metrics
+│   │   ├── intake/page.js             # Intake form + guided analysis chat
 │   │   ├── kyc/page.js                # Post-payment client identification
 │   │   └── api/
 │   │       ├── intake/route.js         # Intake → Supabase + scoring + flags
 │   │       ├── chat/route.js           # Guard check → Claude API
 │   │       ├── consultation/route.js   # Consultation request handler
+│   │       ├── admin/…                 # Admin session + lead APIs (server-side auth)
 │   │       ├── checkout/route.js       # Stripe session creation
 │   │       └── checkout/webhook/route.js # Stripe payment confirmation
 │   ├── lib/
-│   │   ├── supabase.js                # Client (anon + service role)
+│   │   ├── supabase.js                # Server-only client (service role)
+│   │   ├── admin-auth.js              # Admin password check + signed session cookie
+│   │   ├── stripe.js / email.js       # Stripe client + tiers, Resend notifications
 │   │   ├── i18n.js                    # Full bilingual content (EN/ES)
 │   │   ├── system-prompt.js           # Master prompt + escalation + compound triggers
 │   │   └── guard.js                   # Boundary rules + case exclusions
@@ -130,7 +134,7 @@ Activated ONLY when paid professional relationship begins. Not during intake, no
 
 ### Admin Panel (`/admin`)
 
-Login → lead list with filters (status, matter type, urgency) → lead detail with full intake, chat history, internal notes, status management → metrics dashboard (totals, conversion rate, categories, urgency distribution).
+Server-side login (HttpOnly cookie) → lead list with filters (status, matter type, urgency) → lead detail with full intake, chat history, internal notes, status management → metrics dashboard (totals, conversion rate, categories, urgency distribution).
 
 ---
 
@@ -155,24 +159,9 @@ Views: `v_lead_overview`, `v_dashboard_metrics`
 
 ## Deploy
 
-```bash
-vercel
-# Set env vars in Vercel dashboard
-# Point clatec.consulting DNS to Vercel
-# Configure Stripe webhook: https://clatec.consulting/api/checkout/webhook
-```
+See **[DEPLOY.md](DEPLOY.md)** (Spanish): Supabase schema, environment variables, Vercel, Stripe webhook, and the Cloudflare DNS cutover from GitHub Pages.
 
----
-
-## What the Developer Needs to Confirm
-
-1. Exact stack versions (Next.js 14 vs 15)
-2. Supabase project setup + schema execution
-3. Stripe account configuration + webhook endpoint
-4. Calendly setup + embed URL
-5. Resend domain verification
-6. Admin auth approach (placeholder password → Supabase Auth)
-7. Timeline for Phase 1 deployment
+Security model: the browser never talks to Supabase; all data access goes through the API routes with the service role key, and RLS denies everything to the public keys. The admin panel authenticates on the server (`ADMIN_PASSWORD` + HMAC-signed HttpOnly cookie).
 
 ---
 

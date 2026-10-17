@@ -1,5 +1,5 @@
 'use client'
-import { useState, useCallback } from 'react'
+import { useState, useCallback, useEffect } from 'react'
 
 const translations = {
   en: {
@@ -213,10 +213,22 @@ const translations = {
   }
 }
 
+// Spanish by default (as on the current site); the choice is remembered
+// across pages in localStorage.
 export function useLanguage() {
-  const [lang, setLang] = useState('en')
+  const [lang, setLangState] = useState('es')
+  useEffect(() => {
+    try {
+      const saved = localStorage.getItem('clatec_lang')
+      if (saved === 'en' || saved === 'es') setLangState(saved)
+    } catch { /* storage unavailable */ }
+  }, [])
+  const setLang = useCallback((l) => {
+    setLangState(l)
+    try { localStorage.setItem('clatec_lang', l) } catch { /* storage unavailable */ }
+  }, [])
   const t = translations[lang]
-  const toggle = useCallback(() => setLang(l => l === 'en' ? 'es' : 'en'), [])
+  const toggle = useCallback(() => setLang(lang === 'en' ? 'es' : 'en'), [lang, setLang])
   return { t, lang, setLang, toggle }
 }
 

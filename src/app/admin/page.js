@@ -1,34 +1,17 @@
 'use client'
 import { useState, useEffect, useCallback } from 'react'
 
-// In production, use createServerClient or Supabase RLS
-// For now, this uses the anon key with admin RLS policies
-const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL
-const SUPABASE_KEY = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
-
-async function query(table, params = {}) {
-  const url = new URL(`${SUPABASE_URL}/rest/v1/${table}`)
-  url.searchParams.set('select', params.select || '*')
-  if (params.order) url.searchParams.set('order', params.order)
-  if (params.limit) url.searchParams.set('limit', params.limit)
-  if (params.filters) {
-    for (const [k, v] of Object.entries(params.filters)) {
-      url.searchParams.set(k, v)
-    }
-  }
-  const res = await fetch(url, {
-    headers: { apikey: SUPABASE_KEY, Authorization: `Bearer ${SUPABASE_KEY}` }
+// All data goes through /api/admin/* — the server checks the HttpOnly session
+// cookie and talks to Supabase with the service role key. Nothing secret is
+// shipped to the browser.
+async function api(path, options = {}) {
+  const res = await fetch(path, {
+    ...options,
+    headers: { 'Content-Type': 'application/json', ...(options.headers || {}) },
+    credentials: 'same-origin',
   })
+  if (res.status === 401) throw Object.assign(new Error('unauthorized'), { status: 401 })
   return res.json()
-}
-
-async function update(table, id, data) {
-  const url = `${SUPABASE_URL}/rest/v1/${table}?id=eq.${id}`
-  return fetch(url, {
-    method: 'PATCH',
-    headers: { apikey: SUPABASE_KEY, Authorization: `Bearer ${SUPABASE_KEY}`, 'Content-Type': 'application/json', Prefer: 'return=representation' },
-    body: JSON.stringify(data)
-  }).then(r => r.json())
 }
 
 const STATUSES = ['new', 'under_review', 'consultation_requested', 'awaiting_response', 'closed', 'not_qualified', 'archived']
@@ -44,62 +27,67 @@ export default function AdminPanel() {
   const [selected, setSelected] = useState(null)
   const [messages, setMessages] = useState([])
   const [metrics, setMetrics] = useState(null)
+  const [requests, setRequests] = useState([])
   const [filter, setFilter] = useState({ status: '', matter: '', urgency: '' })
   const [view, setView] = useState('list') // list | detail | metrics
   const [loading, setLoading] = useState(false)
 
-  // Simple auth (replace with Supabase Auth in production)
-  const login = () => {
-    // In production, use Supabase Auth. This is a placeholder.
-    if (password === process.env.NEXT_PUBLIC_ADMIN_PASSWORD || password === 'clatec-admin-2026') {
-      setAuth(true)
-    }
+  const [loginError, setLoginError] = useState('')
+  const [checking, setChecking] = useState(true)
+
+  const onUnauthorized = (e) => { if (e?.status === 401) setAuth(false); else console.error(e) }
+
+  useEffect(() => {
+    api('/api/admin/session').then(d => setAuth(!!d.authenticated)).catch(() => {}).finally(() => setChecking(false))
+  }, [])
+
+  const login = async () => {
+    setLoginError('')
+    try {
+      const d = await api('/api/admin/session', { method: 'POST', body: JSON.stringify({ password }) })
+      if (d.authenticated) { setAuth(true); setPassword('') } else setLoginError('Invalid password')
+    } catch { setLoginError('Invalid password') }
+  }
+
+  const logout = async () => {
+    await api('/api/admin/session', { method: 'DELETE' }).catch(() => {})
+    setAuth(false); setLeads([]); setSelected(null); setMessages([]); setMetrics(null)
   }
 
   const loadLeads = useCallback(async () => {
     setLoading(true)
     try {
-      const data = await query('leads', {
-        select: '*, conversations(*), consultation_requests(*)',
-        order: 'created_at.desc',
-        limit: '100'
-      })
-      setLeads(data || [])
-    } catch (e) { console.error(e) }
+      const data = await api('/api/admin/leads')
+      setLeads(data.leads || [])
+      setMetrics(data.metrics || null)
+      setRequests(data.requests || [])
+    } catch (e) { onUnauthorized(e) }
     setLoading(false)
   }, [])
 
   const loadMessages = async (leadId) => {
+    setMessages([])
     try {
-      const convos = await query('conversations', { filters: { lead_id: `eq.${leadId}` } })
-      if (convos?.[0]) {
-        const msgs = await query('messages', {
-          filters: { conversation_id: `eq.${convos[0].id}` },
-          order: 'created_at.asc'
-        })
-        setMessages(msgs || [])
-      }
-    } catch (e) { console.error(e) }
-  }
-
-  const loadMetrics = async () => {
-    try {
-      const data = await query('v_dashboard_metrics')
-      setMetrics(data?.[0] || null)
-    } catch (e) { console.error(e) }
+      const data = await api(`/api/admin/leads/${leadId}`)
+      setMessages(data.messages || [])
+    } catch (e) { onUnauthorized(e) }
   }
 
   const updateStatus = async (leadId, status) => {
-    await update('leads', leadId, { status })
-    setLeads(prev => prev.map(l => l.id === leadId ? { ...l, status } : l))
-    if (selected?.id === leadId) setSelected(prev => ({ ...prev, status }))
+    try {
+      await api(`/api/admin/leads/${leadId}`, { method: 'PATCH', body: JSON.stringify({ status }) })
+      setLeads(prev => prev.map(l => l.id === leadId ? { ...l, status } : l))
+      if (selected?.id === leadId) setSelected(prev => ({ ...prev, status }))
+    } catch (e) { onUnauthorized(e) }
   }
 
   const updateNotes = async (leadId, notes) => {
-    await update('leads', leadId, { internal_notes: notes })
+    try {
+      await api(`/api/admin/leads/${leadId}`, { method: 'PATCH', body: JSON.stringify({ internal_notes: notes || '' }) })
+    } catch (e) { onUnauthorized(e) }
   }
 
-  useEffect(() => { if (auth) { loadLeads(); loadMetrics(); } }, [auth, loadLeads])
+  useEffect(() => { if (auth) loadLeads() }, [auth, loadLeads])
 
   const filteredLeads = leads.filter(l => {
     if (filter.status && l.status !== filter.status) return false
@@ -109,6 +97,7 @@ export default function AdminPanel() {
   })
 
   // ─── LOGIN ───
+  if (checking) return <div style={{ minHeight: '100vh', background: '#070b14' }} />
   if (!auth) {
     return (
       <div style={{ minHeight: '100vh', background: '#070b14', display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: "'DM Sans', system-ui, sans-serif" }}>
@@ -122,6 +111,7 @@ export default function AdminPanel() {
             style={{ width: '100%', background: '#2d8a9a', color: '#fff', border: 'none', padding: '12px', borderRadius: 6, fontSize: 14, fontWeight: 600, cursor: 'pointer' }}>
             Sign In
           </button>
+          {loginError && <div style={{ marginTop: 12, fontSize: 13, color: '#c0392b' }}>{loginError}</div>}
         </div>
       </div>
     )
@@ -148,14 +138,15 @@ export default function AdminPanel() {
           <span style={{ fontSize: 12, color: '#5a6478' }}>Admin</span>
         </div>
         <div style={{ display: 'flex', gap: 8 }}>
-          {['list', 'metrics'].map(v => (
+          {['list', 'requests', 'metrics'].map(v => (
             <button key={v} onClick={() => setView(v)} style={{
               background: view === v ? '#2d8a9a' : 'transparent', color: view === v ? '#fff' : '#8892a4',
               border: `1px solid ${view === v ? '#2d8a9a' : '#1a2236'}`, padding: '6px 16px', borderRadius: 6,
               fontSize: 12, fontWeight: 500, cursor: 'pointer', textTransform: 'capitalize'
-            }}>{v === 'list' ? 'Leads' : 'Metrics'}</button>
+            }}>{v === 'list' ? 'Leads' : v === 'requests' ? `Requests (${requests.length})` : 'Metrics'}</button>
           ))}
           <button onClick={loadLeads} style={{ background: 'transparent', color: '#8892a4', border: '1px solid #1a2236', padding: '6px 12px', borderRadius: 6, fontSize: 12, cursor: 'pointer' }}>↻ Refresh</button>
+          <button onClick={logout} style={{ background: 'transparent', color: '#8892a4', border: '1px solid #1a2236', padding: '6px 12px', borderRadius: 6, fontSize: 12, cursor: 'pointer' }}>Log out</button>
         </div>
       </div>
 
@@ -204,6 +195,33 @@ export default function AdminPanel() {
               ))}
             </div>
           </div>
+        </div>
+      )}
+
+      {/* Requests without intake (NDA, direct payments) */}
+      {view === 'requests' && (
+        <div style={{ padding: 24, maxWidth: 900 }}>
+          <h2 style={{ fontSize: 20, fontWeight: 600, color: '#f0eeea', marginBottom: 24 }}>Requests without intake</h2>
+          {requests.length === 0 && <div style={{ color: '#5a6478', fontSize: 13 }}>No requests</div>}
+          {requests.map(cr => (
+            <div key={cr.id} style={S.card}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 8 }}>
+                <span style={{ fontSize: 14, fontWeight: 600, color: '#f0eeea' }}>{cr.full_name} · {cr.email}{cr.company ? ` · ${cr.company}` : ''}</span>
+                <span style={{ fontSize: 12, color: '#5a6478' }}>{new Date(cr.created_at).toLocaleString()}</span>
+              </div>
+              <span style={S.badge('#27ae60')}>{cr.status}</span>
+              {cr.tier && <span style={{ ...S.badge('#2d8a9a'), marginLeft: 8 }}>{cr.tier} · {cr.payment_amount} €</span>}
+              {cr.payment_status && <span style={{ ...S.badge(cr.payment_status === 'paid' ? '#27ae60' : '#e8a838'), marginLeft: 8 }}>payment: {cr.payment_status}</span>}
+              {cr.kyc_completed_at && <span style={{ ...S.badge('#8e44ad'), marginLeft: 8 }}>KYC ✓</span>}
+              {cr.matter_description && <p style={{ fontSize: 13, color: '#8892a4', marginTop: 8, whiteSpace: 'pre-wrap' }}>{cr.matter_description}</p>}
+              {cr.kyc_data && (
+                <details style={{ marginTop: 6 }}>
+                  <summary style={{ fontSize: 12, color: '#8892a4', cursor: 'pointer' }}>KYC data</summary>
+                  <pre style={{ fontSize: 12, color: '#dfe1e6', whiteSpace: 'pre-wrap', marginTop: 6 }}>{JSON.stringify(cr.kyc_data, null, 2)}</pre>
+                </details>
+              )}
+            </div>
+          ))}
         </div>
       )}
 
@@ -345,8 +363,17 @@ export default function AdminPanel() {
                     {selected.consultation_requests.map((cr, i) => (
                       <div key={i} style={{ marginTop: 8 }}>
                         <span style={S.badge('#27ae60')}>{cr.status}</span>
+                        {cr.tier && <span style={{ ...S.badge('#2d8a9a'), marginLeft: 8 }}>{cr.tier} · {cr.payment_amount} €</span>}
+                        {cr.payment_status && <span style={{ ...S.badge(cr.payment_status === 'paid' ? '#27ae60' : '#e8a838'), marginLeft: 8 }}>payment: {cr.payment_status}</span>}
+                        {cr.kyc_completed_at && <span style={{ ...S.badge('#8e44ad'), marginLeft: 8 }}>KYC ✓</span>}
                         <span style={{ fontSize: 12, color: '#5a6478', marginLeft: 8 }}>{cr.preferred_slot || 'No slot specified'}</span>
                         {cr.matter_description && <p style={{ fontSize: 13, color: '#8892a4', marginTop: 4 }}>{cr.matter_description}</p>}
+                        {cr.kyc_data && (
+                          <details style={{ marginTop: 6 }}>
+                            <summary style={{ fontSize: 12, color: '#8892a4', cursor: 'pointer' }}>KYC data</summary>
+                            <pre style={{ fontSize: 12, color: '#dfe1e6', whiteSpace: 'pre-wrap', marginTop: 6 }}>{JSON.stringify(cr.kyc_data, null, 2)}</pre>
+                          </details>
+                        )}
                       </div>
                     ))}
                   </div>

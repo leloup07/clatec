@@ -1,5 +1,5 @@
 'use client'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import Navbar from '@/components/Navbar'
 import Footer from '@/components/Footer'
 import { useLanguage } from '@/lib/i18n'
@@ -75,19 +75,34 @@ export default function ConsultationPage() {
   const { t, lang, setLang } = useLanguage()
   const [selectedTier, setSelectedTier] = useState(null)
   const [form, setForm] = useState({ name: '', email: '', company: '', matter: '', preferred: '', tier: '' })
-  const [sent, setSent] = useState(false)
   const upd = (k, v) => setForm(p => ({ ...p, [k]: v }))
   const tiers = TIERS[lang]
 
+  const [sending, setSending] = useState(false)
+  const [error, setError] = useState('')
+  const [cancelled, setCancelled] = useState(false)
+  useEffect(() => { setCancelled(new URLSearchParams(window.location.search).has('cancelled')) }, [])
+
+  // Selecting a tier goes to Stripe Checkout (price fixed on the server).
+  // After payment Stripe returns to /kyc, then the booking link is released.
   const handleSubmit = async () => {
-    if (!form.name || !form.email) return
+    if (!form.name || !form.email || !selectedTier || sending) return
+    setSending(true); setError('')
+    let leadId = null
+    try { leadId = sessionStorage.getItem('clatec_lead_id') } catch { /* storage unavailable */ }
     try {
-      await fetch('/api/consultation', {
+      const res = await fetch('/api/checkout', {
         method: 'POST', headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ ...form, tier: selectedTier })
+        body: JSON.stringify({ ...form, tier: selectedTier, leadId, language: lang })
       })
-    } catch (e) { /* silent */ }
-    setSent(true)
+      const data = await res.json().catch(() => ({}))
+      if (!res.ok || !data.url) throw new Error(data.error || 'checkout')
+      window.location.href = data.url
+      return
+    } catch {
+      setError(lang === 'en' ? 'Payment could not be started. Please try again.' : 'No se ha podido iniciar el pago. Inténtalo de nuevo.')
+    }
+    setSending(false)
   }
 
   const S = {
@@ -177,13 +192,14 @@ export default function ConsultationPage() {
         </p>
 
         {/* Request form */}
-        {sent ? (
-          <div className="card" style={{ borderColor: 'var(--success)', textAlign: 'center', padding: 32 }}>
-            <p style={{ color: 'var(--success)', fontWeight: 500, fontSize: 16 }}>
-              {lang === 'en' ? 'Your request has been submitted. We will respond within 24–48 hours with confirmation and scheduling details.' : 'Tu solicitud ha sido enviada. Responderemos en 24–48 horas con confirmación y detalles de programación.'}
+        {cancelled && (
+          <div className="card" style={{ borderColor: '#e8a838', padding: 20, marginBottom: 20 }}>
+            <p style={{ color: '#e8a838', fontSize: 14 }}>
+              {lang === 'en' ? 'Payment was cancelled. No charge has been made.' : 'El pago se ha cancelado. No se ha realizado ningún cargo.'}
             </p>
           </div>
-        ) : (
+        )}
+        {(
           <div className="card" style={{ padding: 28 }}>
             <h3 style={{ fontFamily: 'var(--font-display)', fontSize: 16, fontWeight: 600, color: 'var(--white)', marginBottom: 16 }}>
               {lang === 'en' ? 'Request a Review' : 'Solicitar Revisión'}
@@ -194,7 +210,7 @@ export default function ConsultationPage() {
               <input className="input-field" placeholder={lang === 'en' ? 'Company (optional)' : 'Empresa (opcional)'} value={form.company} onChange={e => upd('company', e.target.value)} />
               <textarea className="input-field" placeholder={lang === 'en' ? 'Brief description or reference to your CLATEC analysis' : 'Descripción breve o referencia a tu análisis CLATEC'} value={form.matter} onChange={e => upd('matter', e.target.value)} />
               <input className="input-field" placeholder={lang === 'en' ? 'Preferred time slot' : 'Franja horaria preferida'} value={form.preferred} onChange={e => upd('preferred', e.target.value)} />
-              <button onClick={handleSubmit} disabled={!form.name || !form.email || !selectedTier}
+              <button onClick={handleSubmit} disabled={!form.name || !form.email || !selectedTier || sending}
                 style={{
                   width: '100%', background: (form.name && form.email && selectedTier) ? 'var(--accent)' : 'var(--border)',
                   color: '#fff', border: 'none', padding: '14px', borderRadius: 6, fontSize: 15, fontWeight: 600,
@@ -204,6 +220,10 @@ export default function ConsultationPage() {
                   ? (tiers.find(t => t.id === selectedTier)?.cta || (lang === 'en' ? 'Submit Request' : 'Enviar Solicitud'))
                   : (lang === 'en' ? 'Select a review type above' : 'Selecciona un tipo de revisión arriba')}
               </button>
+              {error && <p style={{ fontSize: 13, color: 'var(--danger)' }}>{error}</p>}
+              <p style={{ fontSize: 12, color: 'var(--text-dim)', textAlign: 'center' }}>
+                {lang === 'en' ? 'Secure payment via Stripe. You will then complete client identification and book your session.' : 'Pago seguro con Stripe. Después completarás la identificación de cliente y reservarás la sesión.'}
+              </p>
             </div>
           </div>
         )}

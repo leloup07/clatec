@@ -1,8 +1,9 @@
 'use client'
 import { useState } from 'react'
+import { useLanguage } from '@/lib/i18n'
 
 export default function NDAPage() {
-  const [lang, setLang] = useState('en')
+  const { lang, setLang } = useLanguage()
   const [form, setForm] = useState({ name: '', company: '', email: '' })
   const [submitted, setSubmitted] = useState(false)
 
@@ -91,7 +92,15 @@ export default function NDAPage() {
               style={{ background: '#0f1629', border: '1px solid #1a2236', color: '#dfe1e6', padding: '12px 16px', borderRadius: 6, fontSize: 14, outline: 'none' }} />
             <input placeholder={c.emailLabel} type="email" value={form.email} onChange={e => setForm(p => ({ ...p, email: e.target.value }))}
               style={{ background: '#0f1629', border: '1px solid #1a2236', color: '#dfe1e6', padding: '12px 16px', borderRadius: 6, fontSize: 14, outline: 'none' }} />
-            <button onClick={() => { if (form.name && form.email) setSubmitted(true) }}
+            <button onClick={async () => {
+              if (!form.name || !form.email) return
+              // Recorded as a request in the admin panel (and emailed to ADMIN_EMAIL)
+              await fetch('/api/consultation', {
+                method: 'POST', headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ name: form.name, email: form.email, company: form.company, matter: 'NDA pre-firmado solicitado / Pre-signed NDA requested' }),
+              }).catch(() => {})
+              setSubmitted(true)
+            }}
               style={{ background: '#2d8a9a', color: '#fff', border: 'none', padding: '14px', borderRadius: 6, fontSize: 15, fontWeight: 600, cursor: 'pointer' }}>
               {c.request}
             </button>

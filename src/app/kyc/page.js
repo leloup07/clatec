@@ -1,8 +1,16 @@
 'use client'
-import { useState, useEffect } from 'react'
+import { useState, Suspense } from 'react'
 import { useSearchParams } from 'next/navigation'
 
 export default function KYCPage() {
+  return (
+    <Suspense fallback={<div style={{ minHeight: '100vh', background: '#070b14' }} />}>
+      <KYCForm />
+    </Suspense>
+  )
+}
+
+function KYCForm() {
   const params = useSearchParams()
   const lang = params.get('lang') || 'en'
   const tier = params.get('tier') || 'standard'
@@ -20,6 +28,10 @@ export default function KYCPage() {
     isPEP: '', outsideEU: '',
   })
   const [submitted, setSubmitted] = useState(false)
+  const [declared, setDeclared] = useState(false)
+  const [sending, setSending] = useState(false)
+  const [error, setError] = useState('')
+  const [calendlyUrl, setCalendlyUrl] = useState('')
   const upd = (k, v) => setForm(p => ({ ...p, [k]: v }))
 
   const t = {
@@ -79,26 +91,37 @@ export default function KYCPage() {
       schedule: 'Programar Consulta',
       retention: 'De acuerdo con la legislación aplicable, esta información se conservará durante el plazo legalmente exigido.',
     }
-  }[lang] || {/* fallback to en */}
+  }[lang === 'es' ? 'es' : 'en']
+
+  const requiredOk = clientType === 'individual'
+    ? form.fullName && form.countryResidence && form.docType && form.docNumber
+    : clientType === 'entity'
+      ? form.entityName && form.entityCountry && form.repName && form.repDocNumber
+      : false
+  const canSubmit = requiredOk && form.isPEP && form.outsideEU && declared && !sending
 
   const handleSubmit = async () => {
-    // In production: save KYC data to Supabase, link to consultation request
-    // For now: mark as submitted and unlock scheduling
+    if (!canSubmit) return
+    setSending(true); setError('')
     try {
-      await fetch('/api/consultation', {
+      // The server checks with Stripe that this checkout session was paid
+      // before storing the KYC data and releasing the booking link.
+      const res = await fetch('/api/consultation', {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          sessionId,
-          kyc_completed: true,
-          kyc_data: { clientType, ...form, submitted_at: new Date().toISOString() },
-        })
+        body: JSON.stringify({ sessionId, kyc_data: { clientType, ...form } }),
       })
-    } catch (e) { /* continue anyway for UX */ }
-    setSubmitted(true)
+      const data = await res.json().catch(() => ({}))
+      if (!res.ok) throw new Error(data.error || 'error')
+      setCalendlyUrl(data.calendlyUrl || '')
+      setSubmitted(true)
+    } catch {
+      setError(lang === 'es'
+        ? 'No hemos podido verificar el pago o guardar los datos. Inténtalo de nuevo o escríbenos.'
+        : 'We could not verify the payment or save your details. Please try again or contact us.')
+    }
+    setSending(false)
   }
-
-  const calendlyUrl = process.env.NEXT_PUBLIC_CALENDLY_URL || 'https://calendly.com/clatec/consultation'
 
   const S = {
     page: { maxWidth: 620, margin: '0 auto', padding: '60px 24px', fontFamily: "'DM Sans', system-ui, sans-serif", background: '#070b14', minHeight: '100vh', color: '#dfe1e6' },
@@ -117,10 +140,10 @@ export default function KYCPage() {
         <div style={{ ...S.card, textAlign: 'center', borderColor: '#27ae60' }}>
           <div style={{ fontSize: 36, marginBottom: 12 }}>✓</div>
           <p style={{ color: '#27ae60', fontWeight: 600, fontSize: 18, marginBottom: 16 }}>{t.success}</p>
-          <a href={calendlyUrl} target="_blank" rel="noopener noreferrer"
+          {calendlyUrl && <a href={calendlyUrl} target="_blank" rel="noopener noreferrer"
             style={{ display: 'inline-block', background: '#2d8a9a', color: '#fff', padding: '14px 32px', borderRadius: 6, fontSize: 15, fontWeight: 600, textDecoration: 'none' }}>
             {t.schedule}
-          </a>
+          </a>}
         </div>
       </div>
     )
@@ -218,13 +241,16 @@ export default function KYCPage() {
       {clientType && (
         <div style={S.card}>
           <label style={{ display: 'flex', gap: 10, alignItems: 'flex-start', cursor: 'pointer', marginBottom: 16 }}>
-            <input type="checkbox" id="declaration" style={{ marginTop: 3, accentColor: '#2d8a9a' }} />
+            <input type="checkbox" id="declaration" checked={declared} onChange={e => setDeclared(e.target.checked)} style={{ marginTop: 3, accentColor: '#2d8a9a' }} />
             <span style={{ fontSize: 13, color: '#8892a4', lineHeight: 1.5 }}>
               {clientType === 'entity' ? t.declarationEntity : t.declaration}
             </span>
           </label>
           <p style={{ fontSize: 11, color: '#5a6478', marginBottom: 16, lineHeight: 1.5 }}>{t.retention}</p>
-          <button onClick={handleSubmit} style={S.btn}>{t.submit}</button>
+          <button onClick={handleSubmit} disabled={!canSubmit} style={{ ...S.btn, opacity: canSubmit ? 1 : 0.5, cursor: canSubmit ? 'pointer' : 'not-allowed' }}>
+            {sending ? '…' : t.submit}
+          </button>
+          {error && <p style={{ marginTop: 12, fontSize: 13, color: '#c0392b' }}>{error}</p>}
         </div>
       )}
     </div>

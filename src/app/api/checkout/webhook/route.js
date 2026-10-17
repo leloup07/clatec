@@ -1,8 +1,9 @@
 import { NextResponse } from 'next/server'
-import Stripe from 'stripe'
 import { createServerClient } from '@/lib/supabase'
+import { getStripe, UUID } from '@/lib/stripe'
+import { notifyPayment } from '@/lib/email'
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY)
+export const dynamic = 'force-dynamic'
 
 export async function POST(request) {
   const body = await request.text()
@@ -10,39 +11,41 @@ export async function POST(request) {
 
   let event
   try {
-    event = stripe.webhooks.constructEvent(body, sig, process.env.STRIPE_WEBHOOK_SECRET)
+    event = getStripe().webhooks.constructEvent(body, sig, process.env.STRIPE_WEBHOOK_SECRET)
   } catch (err) {
     console.error('Webhook signature verification failed:', err.message)
     return NextResponse.json({ error: 'Invalid signature' }, { status: 400 })
   }
 
-  if (event.type === 'checkout.session.completed') {
+  if (event.type === 'checkout.session.completed' || event.type === 'checkout.session.async_payment_succeeded') {
     const session = event.data.object
+    if (session.payment_status !== 'paid') return NextResponse.json({ received: true })
+
     const supabase = createServerClient()
+    const { data: updated } = await supabase
+      .from('consultation_requests')
+      .update({ payment_status: 'paid', status: 'confirmed' })
+      .eq('stripe_payment_id', session.id)
+      .neq('payment_status', 'paid') // idempotent: Stripe may retry
+      .select('id')
 
-    // Update consultation request payment status
-    if (session.id) {
-      await supabase
-        .from('consultation_requests')
-        .update({ payment_status: 'paid', status: 'confirmed' })
-        .eq('stripe_payment_id', session.id)
-
-      // Update lead status
-      if (session.metadata?.lead_id) {
-        await supabase
-          .from('leads')
-          .update({ status: 'consultation_requested' })
-          .eq('id', session.metadata.lead_id)
-
-        await supabase.from('analytics_events').insert({
-          event_type: 'payment_completed',
-          lead_id: session.metadata.lead_id,
-          metadata: { tier: session.metadata.tier, amount: session.amount_total / 100 },
-        })
-      }
+    const leadId = UUID.test(session.metadata?.lead_id || '') ? session.metadata.lead_id : null
+    if (leadId) {
+      await supabase.from('leads').update({ status: 'consultation_requested' }).eq('id', leadId)
     }
 
-    // TODO: Send confirmation email via Resend
+    if (updated?.length) {
+      await supabase.from('analytics_events').insert({
+        event_type: 'payment_completed', lead_id: leadId,
+        metadata: { tier: session.metadata?.tier, amount: session.amount_total / 100 },
+      })
+      await notifyPayment({
+        email: session.customer_details?.email || session.customer_email,
+        name: session.metadata?.client_name,
+        tier: session.metadata?.tier,
+        amount: session.amount_total / 100,
+      })
+    }
   }
 
   return NextResponse.json({ received: true })
