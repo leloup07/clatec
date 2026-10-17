@@ -604,7 +604,7 @@ function HomePage({ t, navTo, lang }) {
           ].map((a,i) => (
             <a key={i} href={a.url} className="card" style={{ padding:20, textAlign:"center", textDecoration:"none", display:"block" }}>
               <span style={{ fontSize:15, fontWeight:500, color:palette.white }}>{a.name}</span>
-              <span style={{ fontSize:11, color:palette.textDim, display:"block", marginTop:6 }}>{lang === "es" ? "Leer mas" : "Read more"}</span>
+              <span style={{ fontSize:11, color:palette.textDim, display:"block", marginTop:6 }}>{lang === "es" ? "Leer más" : "Read more"}</span>
             </a>
           ))}
         </div>
@@ -648,8 +648,8 @@ function HomePage({ t, navTo, lang }) {
         <div className="card" style={{ padding:24, textAlign:"center" }}>
           <p style={{ fontSize:15, color:palette.textMuted, lineHeight:1.8 }}>
             {lang === "es"
-              ? "Proyectos admitidos y validados en el Sandbox Financiero Espanol. Estructuracion regulatoria transfronteriza en mas de 15 jurisdicciones. Interlocucion directa con CNMV, Banco de Espana y FCA. Evaluador certificado BMM por la Government Blockchain Association."
-              : "Projects admitted and validated in the Spanish Financial Sandbox. Cross-border regulatory structuring across 15+ jurisdictions. Direct regulatory engagement with CNMV, Banco de Espana, and FCA. Certified BMM assessor by the Government Blockchain Association."}
+              ? "Proyectos admitidos y validados en el Sandbox Financiero Español. Estructuración regulatoria transfronteriza en más de 15 jurisdicciones. Interlocución directa con la CNMV, el Banco de España y la FCA. Evaluador certificado BMM por la Government Blockchain Association."
+              : "Projects admitted and validated in the Spanish Financial Sandbox. Cross-border regulatory structuring across 15+ jurisdictions. Direct regulatory engagement with CNMV, Banco de España, and FCA. Certified BMM assessor by the Government Blockchain Association."}
           </p>
         </div>
       </div>
@@ -658,7 +658,7 @@ function HomePage({ t, navTo, lang }) {
       <div style={{ marginTop:32, maxWidth:700, margin:"32px auto 0", textAlign:"center" }}>
         <p style={{ fontSize:14, color:palette.textDim, lineHeight:1.7 }}>
           {lang === "es"
-            ? "Fundado por un abogado habilitado en Espana e Inglaterra y Gales, profesor en IE Business School, Director Regional para Europa de la Government Blockchain Association, con experiencia directa en sandboxes regulatorios y estructuras de tokenizacion en multiples jurisdicciones."
+            ? "Fundado por un abogado habilitado en España y en Inglaterra y Gales, profesor en IE Business School y director regional para Europa de la Government Blockchain Association, con experiencia directa en sandboxes regulatorios y estructuras de tokenización en múltiples jurisdicciones."
             : "Founded by a lawyer admitted in Spain and England and Wales, professor at IE Business School, GBA Europe Regional Director, with direct experience in regulatory sandboxes and tokenization structures across multiple jurisdictions."}
         </p>
       </div>
@@ -670,9 +670,9 @@ function HomePage({ t, navTo, lang }) {
         </div>
         {(lang === "es"
           ? [
-              { q: "Es esto asesoramiento juridico?", a: "No. CLATEC proporciona un diagnostico regulatorio preliminar y estructurado. El asesoramiento juridico formal requiere un compromiso profesional separado." },
-              { q: "Que pasa con mis datos?", a: "Los datos se utilizan exclusivamente para generar tu diagnostico. Consulta nuestra Politica de Privacidad para mas detalle." },
-              { q: "Que pasa despues del analisis?", a: "Recibes un output estructurado con resumen, consideraciones regulatorias, lagunas de informacion y siguiente paso recomendado. Si se justifica revision profesional, puedes proceder a una consulta estructurada de pago." }
+              { q: "¿Es esto asesoramiento jurídico?", a: "No. CLATEC proporciona un diagnóstico regulatorio preliminar y estructurado. El asesoramiento jurídico formal requiere un encargo profesional independiente." },
+              { q: "¿Qué pasa con mis datos?", a: "Los datos se utilizan exclusivamente para generar tu diagnóstico. Consulta nuestra Política de Privacidad para más detalle." },
+              { q: "¿Qué pasa después del análisis?", a: "Recibes un resultado estructurado con un resumen, las consideraciones regulatorias, la información que falta y el siguiente paso recomendado. Si se justifica una revisión profesional, puedes solicitar una consulta estructurada de pago." }
             ]
           : [
               { q: "Is this legal advice?", a: "No. CLATEC provides structured preliminary regulatory diagnostic. Formal legal advice requires a separate professional engagement." },
@@ -751,7 +751,7 @@ function HowPage({ t, navTo, lang }) {
             </h3>
             <p style={{ fontSize:14, color:palette.textMuted, lineHeight:1.7 }}>
               {lang === "es"
-                ? "Completa un cuestionario guiado adaptado a tu tipo de asunto. El sistema adapta sus preguntas segun trabajes en tokenizacion, MiCA, CASP, sandbox u otras materias."
+                ? "Completa un cuestionario guiado adaptado a tu tipo de asunto. El sistema adapta sus preguntas según trabajes en tokenización, MiCA, CASP, sandbox u otras materias."
                 : "Complete a guided questionnaire tailored to your matter type. The system adapts - tokenization, MiCA, CASP, sandbox, or cross-border - asking only what is relevant."}
             </p>
           </div>
@@ -762,28 +762,28 @@ function HowPage({ t, navTo, lang }) {
           </div>
           <div>
             <h3 style={{ fontFamily:fontDisplay, fontSize:18, fontWeight:600, color:palette.white, marginBottom:8 }}>
-              {lang === "es" ? "Recibe tu diagnostico regulatorio" : "Receive your regulatory diagnostic"}
+              {lang === "es" ? "Recibe tu diagnóstico regulatorio" : "Receive your regulatory diagnostic"}
             </h3>
             <p style={{ fontSize:14, color:palette.textMuted, lineHeight:1.7 }}>
               {lang === "es"
-                ? "Un sistema de analisis inteligente identifica marcos aplicables, senala activadores regulatorios, nota lagunas de informacion y estructura las dimensiones juridicas de tu proyecto."
+                ? "Un sistema de análisis inteligente identifica los marcos aplicables, señala los activadores regulatorios, detecta la información que falta y estructura las dimensiones jurídicas de tu proyecto."
                 : "An intelligent analysis system identifies applicable frameworks, flags regulatory triggers, notes information gaps, and structures the legal dimensions of your project."}
             </p>
           </div>
         </div>
         <div style={{ textAlign:"center", margin:"24px 0" }}>
           <button className="btn-primary" onClick={()=>navTo("intake")} style={{ fontSize:16, padding:"16px 40px" }}>
-            {lang === "es" ? "Iniciar Analisis Gratuito" : "Start Free Analysis"}
+            {lang === "es" ? "Iniciar Análisis Gratuito" : "Start Free Analysis"}
           </button>
           <p style={{ fontSize:12, color:palette.textDim, marginTop:10 }}>
-            {lang === "es" ? "Sin coste. Sin compromiso. Solo diagnostico preliminar." : "No cost. No commitment. Preliminary diagnostic only."}
+            {lang === "es" ? "Sin coste. Sin compromiso. Solo diagnóstico preliminar." : "No cost. No commitment. Preliminary diagnostic only."}
           </p>
         </div>
       </div>
       <div style={{ display:"flex", alignItems:"center", gap:16, margin:"48px 0" }}>
         <div style={{ flex:1, height:1, background:palette.border }}></div>
         <span style={{ fontSize:12, color:palette.textDim, letterSpacing:1 }}>
-          {lang === "es" ? "CUANDO SE NECESITA MAS" : "WHEN MORE IS NEEDED"}
+          {lang === "es" ? "CUANDO SE NECESITA MÁS" : "WHEN MORE IS NEEDED"}
         </span>
         <div style={{ flex:1, height:1, background:palette.border }}></div>
       </div>
@@ -802,21 +802,21 @@ function HowPage({ t, navTo, lang }) {
           </div>
           <div>
             <h3 style={{ fontFamily:fontDisplay, fontSize:18, fontWeight:600, color:palette.white, marginBottom:8 }}>
-              {lang === "es" ? "Revision profesional estructurada" : "Structured professional review"}
+              {lang === "es" ? "Revisión profesional estructurada" : "Structured professional review"}
             </h3>
             <p style={{ fontSize:14, color:palette.textMuted, lineHeight:1.7 }}>
               {lang === "es"
-                ? "Cuando el diagnostico identifica riesgos regulatorios que requieren analisis profesional, puedes proceder a una revision estructurada con profesionales juridicos habilitados. Confirmacion de supuestos, analisis de riesgos criticos, escenarios y recomendacion clara."
+                ? "Cuando el diagnóstico identifica riesgos regulatorios que requieren un análisis profesional, puedes solicitar una revisión estructurada con profesionales jurídicos habilitados: confirmación de supuestos, análisis de los riesgos críticos, escenarios y una recomendación clara."
                 : "When the diagnostic identifies regulatory risks that require professional analysis, you can proceed to a structured review with qualified legal professionals. Assumption confirmation, critical risk analysis, scenario mapping, and clear recommendation."}
             </p>
             <div style={{ display:"flex", gap:16, marginTop:12 }}>
               <div style={{ background:palette.bgInput, border:"1px solid "+palette.border, borderRadius:6, padding:"10px 16px" }}>
-                <span style={{ fontSize:12, color:palette.textDim }}>Structured Review</span>
-                <div style={{ fontSize:18, fontWeight:700, color:palette.accent, fontFamily:fontDisplay }}>\u20AC450</div>
+                <span style={{ fontSize:12, color:palette.textDim }}>{lang === "es" ? "Revisión Estructurada" : "Structured Review"}</span>
+                <div style={{ fontSize:18, fontWeight:700, color:palette.accent, fontFamily:fontDisplay }}>{lang === "es" ? "450 €" : "€450"}</div>
               </div>
               <div style={{ background:palette.bgInput, border:"1px solid "+palette.border, borderRadius:6, padding:"10px 16px" }}>
-                <span style={{ fontSize:12, color:palette.textDim }}>Complex Matter</span>
-                <div style={{ fontSize:18, fontWeight:700, color:palette.accent, fontFamily:fontDisplay }}>\u20AC750</div>
+                <span style={{ fontSize:12, color:palette.textDim }}>{lang === "es" ? "Asunto Complejo" : "Complex Matter"}</span>
+                <div style={{ fontSize:18, fontWeight:700, color:palette.accent, fontFamily:fontDisplay }}>{lang === "es" ? "750 €" : "€750"}</div>
               </div>
             </div>
           </div>
@@ -856,8 +856,8 @@ function ConsultationPage({ t, lang, sent, setSent }) {
   const upd = (k,v) => setForm(p=>({...p,[k]:v}));
 
   const tiers = lang === "es" ? [
-    { id:"standard", name:"Revisión Estructurada", price:"€450", d:"Revisión profesional de tu output diagnóstico CLATEC. Enfocada en las 2–3 consideraciones regulatorias críticas identificadas.", includes:["Revisión del mapeo diagnóstico CLATEC","Confirmación de asunciones clave","Análisis de riesgos regulatorios críticos","Próximos pasos recomendados","Resumen escrito post-sesión"], note:"Adecuado para la mayoría de asuntos de tokenización, MiCA y CASP." },
-    { id:"complex", name:"Revisión de Asunto Complejo", price:"€750", d:"Revisión profesional en profundidad para asuntos que implican solicitudes de sandbox, posible clasificación ART/EMT o estructuras multi-jurisdiccionales.", includes:["Todo lo incluido en la Revisión Estructurada","Sesión de análisis extendida","Mapeo regulatorio multi-marco","Árbol de decisión para opciones de estructuración","Recomendación de alcance para compromiso formal"], note:"Recomendado para sandbox, stablecoin y asuntos transfronterizos." }
+    { id:"standard", name:"Revisión Estructurada", price:"450 €", d:"Revisión profesional de tu output diagnóstico CLATEC. Enfocada en las 2–3 consideraciones regulatorias críticas identificadas.", includes:["Revisión del mapeo diagnóstico CLATEC","Confirmación de asunciones clave","Análisis de riesgos regulatorios críticos","Próximos pasos recomendados","Resumen escrito post-sesión"], note:"Adecuado para la mayoría de asuntos de tokenización, MiCA y CASP." },
+    { id:"complex", name:"Revisión de Asunto Complejo", price:"750 €", d:"Revisión profesional en profundidad para asuntos que implican solicitudes de sandbox, posible clasificación ART/EMT o estructuras multi-jurisdiccionales.", includes:["Todo lo incluido en la Revisión Estructurada","Sesión de análisis extendida","Mapeo regulatorio multi-marco","Árbol de decisión para opciones de estructuración","Recomendación de alcance para compromiso formal"], note:"Recomendado para sandbox, stablecoin y asuntos transfronterizos." }
   ] : [
     { id:"standard", name:"Structured Review", price:"€450", d:"Professional review of your CLATEC diagnostic output. Focused on the 2–3 critical regulatory considerations identified.", includes:["Review of CLATEC diagnostic mapping","Confirmation of key assumptions","Analysis of critical regulatory risks","Recommended next steps","Post-session written summary"], note:"Suitable for most tokenization, MiCA, and CASP matters." },
     { id:"complex", name:"Complex Matter Review", price:"€750", d:"In-depth professional review for matters involving sandbox applications, potential ART/EMT classification, or multi-jurisdictional structures.", includes:["Everything in Structured Review","Extended analysis session","Multi-framework regulatory mapping","Decision tree for key structuring choices","Scope recommendation for formal engagement"], note:"Recommended for sandbox, stablecoin, and cross-border matters." }
@@ -1346,7 +1346,7 @@ function ChatPage({ t, lang, intake, messages, setMessages, navTo }) {
 
   const sendMessage = () => {
     if (messages.length >= 10) {
-      setChatMessages(prev => [...prev, { role: "assistant", content: lang === "en" ? "This analysis session has reached its limit. For further analysis, please proceed to professional review." : "Esta sesion de analisis ha alcanzado su limite. Para analisis adicional, proceda a revision profesional." }]);
+      setChatMessages(prev => [...prev, { role: "assistant", content: lang === "en" ? "This analysis session has reached its limit. For further analysis, please proceed to professional review." : "Esta sesión de análisis ha alcanzado su límite. Para un análisis adicional, solicita una revisión profesional." }]);
       return;
     }
     if (!input.trim() || loading) return;
